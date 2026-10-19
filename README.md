@@ -1,8 +1,8 @@
 # mbot-flow
 
-Self-hosted block and flowchart programming for the classic Makeblock **mBot** (mCore), made for kids. A small
-server on your PC serves the web GUI (English and German); programs are compiled to bytecode and run **on the
-robot** by a custom firmware.
+Self-hosted block and flowchart programming for the classic Makeblock **mBot** (mCore), made for kids – an
+open-source alternative to mBlock. A small server on your PC serves the web GUI (English and German); programs
+are compiled to bytecode and run **on the robot** by a custom firmware.
 
 ![The three editors: simple blocks, Blockly and the flowchart](docs/images/editors.png)
 

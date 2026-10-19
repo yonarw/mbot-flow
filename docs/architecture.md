@@ -24,6 +24,7 @@ and its sensor values, and the page shows them live. VM, instruction set and wir
 | `pico_bridge/` | MicroPython WiFi ↔ serial bridge for a Pico W in the Bluetooth module's socket |
 | `factory/`, `restore_factory.sh` | Makeblock's original firmware sources, to go back |
 | `tools/` | `setup.sh` (toolchain), `acli` (project-local arduino-cli), `read_flash.py` (flash backup) |
+| `scripts/` | `make-social-preview.sh`: GitHub's link-card image from the README screenshot (uploaded by hand) |
 | `tests/` | compiler, VM, program store, autoconnect and translation tests; a check that the firmware's opcode table matches `bytecode.py` |
 
 ## One syntax tree for everything
