@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# arduino-cli with all state kept inside tools/ (nothing installed system-wide)
+T="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export ARDUINO_DIRECTORIES_DATA="$T/arduino-data"
+export ARDUINO_DIRECTORIES_USER="$T/arduino-user"
+export ARDUINO_DIRECTORIES_DOWNLOADS="$T/arduino-data/staging"
+exec "$T/bin/arduino-cli" "$@"

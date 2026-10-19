@@ -1,0 +1,1187 @@
+[
+  {
+    "name": "quadrat",
+    "symbol": "🔷",
+    "blocks": [
+      {
+        "type": "forward",
+        "n": 3
+      },
+      {
+        "type": "right",
+        "deg": 90
+      },
+      {
+        "type": "beep"
+      },
+      {
+        "type": "forward",
+        "n": 3
+      },
+      {
+        "type": "right",
+        "deg": 90
+      },
+      {
+        "type": "beep"
+      },
+      {
+        "type": "forward",
+        "n": 3
+      },
+      {
+        "type": "right",
+        "deg": 90
+      },
+      {
+        "type": "beep"
+      },
+      {
+        "type": "forward",
+        "n": 3
+      },
+      {
+        "type": "right",
+        "deg": 90
+      },
+      {
+        "type": "beep"
+      }
+    ],
+    "saved": 1792242368
+  },
+  {
+    "name": "Für Elise",
+    "symbol": "🎵",
+    "blocks": [
+      {
+        "type": "beep",
+        "hz": 659,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 622,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 659,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 622,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 659,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 494,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 587,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 523,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 440,
+        "sec": 0.25
+      },
+      {
+        "type": "wait",
+        "sec": 0.25
+      },
+      {
+        "type": "beep",
+        "hz": 262,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 330,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 440,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 494,
+        "sec": 0.25
+      },
+      {
+        "type": "wait",
+        "sec": 0.25
+      },
+      {
+        "type": "beep",
+        "hz": 330,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 415,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 494,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 523,
+        "sec": 0.25
+      },
+      {
+        "type": "wait",
+        "sec": 0.25
+      },
+      {
+        "type": "beep",
+        "hz": 330,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 659,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 622,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 659,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 622,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 659,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 494,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 587,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 523,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 440,
+        "sec": 0.25
+      },
+      {
+        "type": "wait",
+        "sec": 0.25
+      },
+      {
+        "type": "beep",
+        "hz": 262,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 330,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 440,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 494,
+        "sec": 0.25
+      },
+      {
+        "type": "wait",
+        "sec": 0.25
+      },
+      {
+        "type": "beep",
+        "hz": 330,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 523,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 494,
+        "sec": 0.1
+      },
+      {
+        "type": "wait",
+        "sec": 0.1
+      },
+      {
+        "type": "beep",
+        "hz": 440,
+        "sec": 0.75
+      }
+    ],
+    "saved": 1792332404
+  },
+  {
+    "name": "Linie folgen",
+    "symbol": "🚗",
+    "kind": "advanced",
+    "workspace": {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "mbot_start",
+            "id": "1@RERZ6XrROY#R2v}zM%",
+            "x": 30,
+            "y": 30,
+            "icons": {
+              "comment": {
+                "text": "Linie folgen: schwarzes Klebeband (ca. 2 cm breit) auf hellem Boden, Roboter mit beiden Augen auf die Linie stellen.\nTempo: Geschwindigkeit geradeaus. Innen: das innere Rad in Kurven (0 = steht, negativ = rückwärts, schärfere Kurven). Suche: Drehtempo, wenn die Linie verloren ist. Unter ca. 30 % drehen die Räder nicht.",
+                "pinned": false,
+                "height": 150,
+                "width": 320
+              }
+            },
+            "next": {
+              "block": {
+                "type": "variables_set",
+                "id": "jej#]=?R]%=QVa|ov!)|",
+                "fields": {
+                  "VAR": {
+                    "id": "v_tempo"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "id": ":$OwLgiR5E~4BY*G#1AD",
+                      "fields": {
+                        "NUM": 40
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "id": "rC#B@5C$_oKyUBh/kQq|",
+                    "fields": {
+                      "VAR": {
+                        "id": "v_innen"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "math_number",
+                          "id": "r*cT.em/.BD;XlDrJ*=Y",
+                          "fields": {
+                            "NUM": 0
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "variables_set",
+                        "id": "w|%wtN_P;Lci-f;x*pW2",
+                        "fields": {
+                          "VAR": {
+                            "id": "v_suche"
+                          }
+                        },
+                        "inputs": {
+                          "VALUE": {
+                            "block": {
+                              "type": "math_number",
+                              "id": "Jr8o-^:=722m.O^mDD7v",
+                              "fields": {
+                                "NUM": 35
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "variables_set",
+                            "id": "xy@37bbnLDVaf;aSQtIf",
+                            "fields": {
+                              "VAR": {
+                                "id": "v_zuletzt"
+                              }
+                            },
+                            "inputs": {
+                              "VALUE": {
+                                "block": {
+                                  "type": "math_number",
+                                  "id": "nr2[vza!Vx6sbYA/}8).",
+                                  "fields": {
+                                    "NUM": 1
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "mbot_forever",
+                                "id": "{KW[_=vd3X$,zB8${(LR",
+                                "icons": {
+                                  "comment": {
+                                    "text": "Kein „warte“ in der Schleife: der Roboter prüft die Sensoren tausende Male pro Sekunde.",
+                                    "pinned": false,
+                                    "height": 90,
+                                    "width": 260
+                                  }
+                                },
+                                "inputs": {
+                                  "DO": {
+                                    "block": {
+                                      "type": "mbot_if_else",
+                                      "id": "oodAoV.d2h*L_}VXTj^b",
+                                      "icons": {
+                                        "comment": {
+                                          "text": "Beide Augen auf der Linie: geradeaus.",
+                                          "pinned": false,
+                                          "height": 90,
+                                          "width": 260
+                                        }
+                                      },
+                                      "inputs": {
+                                        "COND": {
+                                          "block": {
+                                            "type": "mbot_logic",
+                                            "id": "Q7?h(eA%k[`%[WkH51py",
+                                            "fields": {
+                                              "FN": "and"
+                                            },
+                                            "inputs": {
+                                              "A": {
+                                                "block": {
+                                                  "type": "mbot_line",
+                                                  "id": "avp50.172jar0RXD/y8S",
+                                                  "fields": {
+                                                    "SIDE": "left"
+                                                  }
+                                                }
+                                              },
+                                              "B": {
+                                                "block": {
+                                                  "type": "mbot_line",
+                                                  "id": "l49*cTk~KZ%d`5Tf_jXN",
+                                                  "fields": {
+                                                    "SIDE": "right"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "THEN": {
+                                          "block": {
+                                            "type": "mbot_drive",
+                                            "id": "D^3;36]D-36VJT~%3;R0",
+                                            "fields": {
+                                              "DIR": "forward"
+                                            },
+                                            "inputs": {
+                                              "POWER": {
+                                                "block": {
+                                                  "type": "variables_get",
+                                                  "id": "1:B8E`3lj(X;M=0(6_zH",
+                                                  "fields": {
+                                                    "VAR": {
+                                                      "id": "v_tempo"
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "ELSE": {
+                                          "block": {
+                                            "type": "mbot_if_else",
+                                            "id": "N}.]nPn:1hCvA7okP]l#",
+                                            "icons": {
+                                              "comment": {
+                                                "text": "Nur ein Auge auf der Linie: die Linie ist auf dieser Seite. Das Rad auf dieser Seite langsamer, dann fährt er eine Kurve dorthin.",
+                                                "pinned": false,
+                                                "height": 90,
+                                                "width": 260
+                                              }
+                                            },
+                                            "inputs": {
+                                              "COND": {
+                                                "block": {
+                                                  "type": "mbot_line",
+                                                  "id": "$0sAxm/:w]OVZP}BNQ/Y",
+                                                  "fields": {
+                                                    "SIDE": "left"
+                                                  }
+                                                }
+                                              },
+                                              "THEN": {
+                                                "block": {
+                                                  "type": "mbot_motors",
+                                                  "id": "fnZnCNZdC^i.qqHm*z+i",
+                                                  "inputs": {
+                                                    "LEFT": {
+                                                      "block": {
+                                                        "type": "variables_get",
+                                                        "id": "KO8Z%B2Y=nr[?HIcqJ3P",
+                                                        "fields": {
+                                                          "VAR": {
+                                                            "id": "v_innen"
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "RIGHT": {
+                                                      "block": {
+                                                        "type": "variables_get",
+                                                        "id": ":p)=.Wz(iT|axja%h,(0",
+                                                        "fields": {
+                                                          "VAR": {
+                                                            "id": "v_tempo"
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "next": {
+                                                    "block": {
+                                                      "type": "variables_set",
+                                                      "id": "W%?A(cjy7^?f4ZTyiu-%",
+                                                      "fields": {
+                                                        "VAR": {
+                                                          "id": "v_zuletzt"
+                                                        }
+                                                      },
+                                                      "inputs": {
+                                                        "VALUE": {
+                                                          "block": {
+                                                            "type": "math_number",
+                                                            "id": "-T_jtAoU[?YuNiNt{fOk",
+                                                            "fields": {
+                                                              "NUM": 1
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "ELSE": {
+                                                "block": {
+                                                  "type": "mbot_if_else",
+                                                  "id": "x.E.31Xr~lrpc586wJre",
+                                                  "inputs": {
+                                                    "COND": {
+                                                      "block": {
+                                                        "type": "mbot_line",
+                                                        "id": "Z8KEcphT8b6TCl:xl/%=",
+                                                        "fields": {
+                                                          "SIDE": "right"
+                                                        }
+                                                      }
+                                                    },
+                                                    "THEN": {
+                                                      "block": {
+                                                        "type": "mbot_motors",
+                                                        "id": "3(H`njdy.i:Y_X~.y*;4",
+                                                        "inputs": {
+                                                          "LEFT": {
+                                                            "block": {
+                                                              "type": "variables_get",
+                                                              "id": "$uLD$1c+Dj(e#cC`UNI(",
+                                                              "fields": {
+                                                                "VAR": {
+                                                                  "id": "v_tempo"
+                                                                }
+                                                              }
+                                                            }
+                                                          },
+                                                          "RIGHT": {
+                                                            "block": {
+                                                              "type": "variables_get",
+                                                              "id": "Yq7emeHDm?VpBWjC$oM~",
+                                                              "fields": {
+                                                                "VAR": {
+                                                                  "id": "v_innen"
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        },
+                                                        "next": {
+                                                          "block": {
+                                                            "type": "variables_set",
+                                                            "id": "JoVN?lo#GqE[O.^3M6LN",
+                                                            "fields": {
+                                                              "VAR": {
+                                                                "id": "v_zuletzt"
+                                                              }
+                                                            },
+                                                            "inputs": {
+                                                              "VALUE": {
+                                                                "block": {
+                                                                  "type": "math_number",
+                                                                  "id": "rjaC}9Vy%yn]t7~hI|1:",
+                                                                  "fields": {
+                                                                    "NUM": 2
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "ELSE": {
+                                                      "block": {
+                                                        "type": "mbot_if_else",
+                                                        "id": "z.{:/HkeQ|b!4o|MkG@*",
+                                                        "icons": {
+                                                          "comment": {
+                                                            "text": "Beide Augen sehen weiß: Linie verloren (z. B. scharfe Ecke). Auf der Stelle dorthin drehen, wo sie zuletzt war.",
+                                                            "pinned": false,
+                                                            "height": 90,
+                                                            "width": 260
+                                                          }
+                                                        },
+                                                        "inputs": {
+                                                          "COND": {
+                                                            "block": {
+                                                              "type": "mbot_compare",
+                                                              "id": "cbfp.3hvOwJkUVrpggV5",
+                                                              "fields": {
+                                                                "FN": "="
+                                                              },
+                                                              "inputs": {
+                                                                "A": {
+                                                                  "block": {
+                                                                    "type": "variables_get",
+                                                                    "id": "*f-$!H*n),Z!,L,UZ-=p",
+                                                                    "fields": {
+                                                                      "VAR": {
+                                                                        "id": "v_zuletzt"
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                },
+                                                                "B": {
+                                                                  "shadow": {
+                                                                    "type": "math_number",
+                                                                    "id": "jA{:4$7smQ_rq4-X_7R.",
+                                                                    "fields": {
+                                                                      "NUM": 1
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          },
+                                                          "THEN": {
+                                                            "block": {
+                                                              "type": "mbot_drive",
+                                                              "id": "JYgq-62oyMJz5aao1Ts_",
+                                                              "fields": {
+                                                                "DIR": "left"
+                                                              },
+                                                              "inputs": {
+                                                                "POWER": {
+                                                                  "block": {
+                                                                    "type": "variables_get",
+                                                                    "id": "XQFGs6C9ADFt$b3HDxcD",
+                                                                    "fields": {
+                                                                      "VAR": {
+                                                                        "id": "v_suche"
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          },
+                                                          "ELSE": {
+                                                            "block": {
+                                                              "type": "mbot_drive",
+                                                              "id": "KLi#($;#,DNK{Aps]-PO",
+                                                              "fields": {
+                                                                "DIR": "right"
+                                                              },
+                                                              "inputs": {
+                                                                "POWER": {
+                                                                  "block": {
+                                                                    "type": "variables_get",
+                                                                    "id": "j;0fGTjzv@}3$kpfI1ml",
+                                                                    "fields": {
+                                                                      "VAR": {
+                                                                        "id": "v_suche"
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "variables": [
+        {
+          "name": "Tempo",
+          "id": "v_tempo"
+        },
+        {
+          "name": "Innen",
+          "id": "v_innen"
+        },
+        {
+          "name": "Suche",
+          "id": "v_suche"
+        },
+        {
+          "name": "zuletzt",
+          "id": "v_zuletzt"
+        }
+      ]
+    },
+    "ast": {
+      "body": [
+        {
+          "id": "jej#]=?R]%=QVa|ov!)|",
+          "do": "set",
+          "var": "Tempo",
+          "value": {
+            "op": "num",
+            "value": 40
+          }
+        },
+        {
+          "id": "rC#B@5C$_oKyUBh/kQq|",
+          "do": "set",
+          "var": "Innen",
+          "value": {
+            "op": "num",
+            "value": 0
+          }
+        },
+        {
+          "id": "w|%wtN_P;Lci-f;x*pW2",
+          "do": "set",
+          "var": "Suche",
+          "value": {
+            "op": "num",
+            "value": 35
+          }
+        },
+        {
+          "id": "xy@37bbnLDVaf;aSQtIf",
+          "do": "set",
+          "var": "zuletzt",
+          "value": {
+            "op": "num",
+            "value": 1
+          }
+        },
+        {
+          "id": "{KW[_=vd3X$,zB8${(LR",
+          "do": "forever",
+          "body": [
+            {
+              "id": "oodAoV.d2h*L_}VXTj^b",
+              "do": "if",
+              "cond": {
+                "op": "bin",
+                "fn": "and",
+                "a": {
+                  "op": "sensor",
+                  "name": "line_left"
+                },
+                "b": {
+                  "op": "sensor",
+                  "name": "line_right"
+                }
+              },
+              "then": [
+                {
+                  "id": "D^3;36]D-36VJT~%3;R0",
+                  "do": "drive",
+                  "dir": "forward",
+                  "power": {
+                    "op": "var",
+                    "name": "Tempo"
+                  }
+                }
+              ],
+              "else": [
+                {
+                  "id": "N}.]nPn:1hCvA7okP]l#",
+                  "do": "if",
+                  "cond": {
+                    "op": "sensor",
+                    "name": "line_left"
+                  },
+                  "then": [
+                    {
+                      "id": "fnZnCNZdC^i.qqHm*z+i",
+                      "do": "motors",
+                      "left": {
+                        "op": "var",
+                        "name": "Innen"
+                      },
+                      "right": {
+                        "op": "var",
+                        "name": "Tempo"
+                      }
+                    },
+                    {
+                      "id": "W%?A(cjy7^?f4ZTyiu-%",
+                      "do": "set",
+                      "var": "zuletzt",
+                      "value": {
+                        "op": "num",
+                        "value": 1
+                      }
+                    }
+                  ],
+                  "else": [
+                    {
+                      "id": "x.E.31Xr~lrpc586wJre",
+                      "do": "if",
+                      "cond": {
+                        "op": "sensor",
+                        "name": "line_right"
+                      },
+                      "then": [
+                        {
+                          "id": "3(H`njdy.i:Y_X~.y*;4",
+                          "do": "motors",
+                          "left": {
+                            "op": "var",
+                            "name": "Tempo"
+                          },
+                          "right": {
+                            "op": "var",
+                            "name": "Innen"
+                          }
+                        },
+                        {
+                          "id": "JoVN?lo#GqE[O.^3M6LN",
+                          "do": "set",
+                          "var": "zuletzt",
+                          "value": {
+                            "op": "num",
+                            "value": 2
+                          }
+                        }
+                      ],
+                      "else": [
+                        {
+                          "id": "z.{:/HkeQ|b!4o|MkG@*",
+                          "do": "if",
+                          "cond": {
+                            "op": "bin",
+                            "fn": "=",
+                            "a": {
+                              "op": "var",
+                              "name": "zuletzt"
+                            },
+                            "b": {
+                              "op": "num",
+                              "value": 1
+                            }
+                          },
+                          "then": [
+                            {
+                              "id": "JYgq-62oyMJz5aao1Ts_",
+                              "do": "drive",
+                              "dir": "left",
+                              "power": {
+                                "op": "var",
+                                "name": "Suche"
+                              }
+                            }
+                          ],
+                          "else": [
+                            {
+                              "id": "KLi#($;#,DNK{Aps]-PO",
+                              "do": "drive",
+                              "dir": "right",
+                              "power": {
+                                "op": "var",
+                                "name": "Suche"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "saved": 1792343944
+  },
+  {
+    "name": "Hindernis ausweichen",
+    "symbol": "🚗",
+    "kind": "advanced",
+    "workspace": {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          {
+            "type": "mbot_start",
+            "id": "c/nIZ]j`__ZF8XAAv6c_",
+            "x": 30,
+            "y": 30,
+            "icons": {
+              "comment": {
+                "text": "Hindernis ausweichen: fährt geradeaus und dreht ab, sobald etwas näher als 20 cm ist.",
+                "pinned": false,
+                "height": 80,
+                "width": 260
+              }
+            },
+            "next": {
+              "block": {
+                "type": "mbot_forever",
+                "id": "r5fX1L[c_**OpbbRd!mT",
+                "inputs": {
+                  "DO": {
+                    "block": {
+                      "type": "mbot_if_else",
+                      "id": "7epAw6*ObU4Sf[:CA+c;",
+                      "inputs": {
+                        "COND": {
+                          "block": {
+                            "type": "mbot_compare",
+                            "id": "_Ne]J%EllOn5`q+mukj6",
+                            "fields": {
+                              "FN": "<"
+                            },
+                            "inputs": {
+                              "A": {
+                                "block": {
+                                  "type": "mbot_distance",
+                                  "id": ")!2Y((8/c?,yWY:Ho,fo"
+                                }
+                              },
+                              "B": {
+                                "block": {
+                                  "type": "math_number",
+                                  "id": "pAont!zq%NxR+iw{3mfq",
+                                  "fields": {
+                                    "NUM": 20
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "THEN": {
+                          "block": {
+                            "type": "mbot_beep",
+                            "id": "@-**2O(@nB$NRyCWaptf",
+                            "inputs": {
+                              "HZ": {
+                                "block": {
+                                  "type": "math_number",
+                                  "id": "ycZptgUuQcE!JKpc_1j3",
+                                  "fields": {
+                                    "NUM": 880
+                                  }
+                                }
+                              },
+                              "SEC": {
+                                "block": {
+                                  "type": "math_number",
+                                  "id": "LmwnQ8+A/q`0lqkGDw0^",
+                                  "fields": {
+                                    "NUM": 0.2
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "mbot_turn",
+                                "id": "~L+6g*Vw,5m{O8X9gB`j",
+                                "fields": {
+                                  "DIR": "right",
+                                  "DEG": 90
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "ELSE": {
+                          "block": {
+                            "type": "mbot_drive",
+                            "id": "zKA1X!sh,Hq|2Rwv`+@6",
+                            "fields": {
+                              "DIR": "forward"
+                            },
+                            "inputs": {
+                              "POWER": {
+                                "block": {
+                                  "type": "math_number",
+                                  "id": "ac[-dtu]Y~WO`s4f:EU5",
+                                  "fields": {
+                                    "NUM": 50
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "ast": {
+      "body": [
+        {
+          "id": "r5fX1L[c_**OpbbRd!mT",
+          "do": "forever",
+          "body": [
+            {
+              "id": "7epAw6*ObU4Sf[:CA+c;",
+              "do": "if",
+              "cond": {
+                "op": "bin",
+                "fn": "<",
+                "a": {
+                  "op": "sensor",
+                  "name": "distance"
+                },
+                "b": {
+                  "op": "num",
+                  "value": 20
+                }
+              },
+              "then": [
+                {
+                  "id": "@-**2O(@nB$NRyCWaptf",
+                  "do": "beep",
+                  "hz": {
+                    "op": "num",
+                    "value": 880
+                  },
+                  "sec": {
+                    "op": "num",
+                    "value": 0.2
+                  },
+                  "wait": true
+                },
+                {
+                  "id": "~L+6g*Vw,5m{O8X9gB`j",
+                  "do": "turn",
+                  "dir": "right",
+                  "deg": 90
+                }
+              ],
+              "else": [
+                {
+                  "id": "zKA1X!sh,Hq|2Rwv`+@6",
+                  "do": "drive",
+                  "dir": "forward",
+                  "power": {
+                    "op": "num",
+                    "value": 50
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "functions": {}
+    },
+    "saved": 1792393716
+  }
+]

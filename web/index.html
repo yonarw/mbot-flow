@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mBot Programmierer</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A4%96%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="top">
+  <h1><span class="logo" aria-hidden="true">🤖</span> mBot Programmierer</h1>
+  <div class="top-right">
+    <div class="modes" role="group" aria-label="Modus">
+      <button type="button" class="mode-btn" data-mode="simple" aria-pressed="true">Einfach</button>
+      <button type="button" class="mode-btn" data-mode="advanced" aria-pressed="false">Profi</button>
+    </div>
+    <button id="status" class="chip off" type="button" title="Verbindung einrichten">○ Nicht verbunden</button>
+    <button id="btn-cal" class="btn ghost" type="button">⚙ Kalibrierung</button>
+  </div>
+</header>
+
+<div id="banner" class="banner" role="alert" hidden></div>
+
+<main class="layout">
+  <div class="side">
+    <section class="card palette" aria-labelledby="h-palette">
+      <h2 id="h-palette">Bausteine</h2>
+      <p class="hint">Ziehe einen Baustein nach rechts – oder tippe ihn einfach an.</p>
+      <div id="palette" class="palette-list"></div>
+    </section>
+
+    <section class="card mine" aria-labelledby="h-mine">
+      <h2 id="h-mine">Meine Programme</h2>
+      <p class="hint">Gespeicherte Programme kannst du wie Bausteine benutzen.</p>
+      <div id="my-programs" class="palette-list"></div>
+      <button id="btn-manage" class="btn ghost small manage" type="button">⚙ Verwalten</button>
+    </section>
+  </div>
+
+  <section class="card program" aria-labelledby="h-program">
+    <div class="program-head">
+      <h2 id="h-program">Dein Programm</h2>
+      <div class="actions">
+        <button class="btn go" type="button" data-action="run">▶ Start</button>
+        <button class="btn stop" type="button" data-action="stop">■ Stopp</button>
+        <button id="btn-clear" class="btn ghost" type="button">🗑 Leeren</button>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-action="save">💾 Speichern</button>
+        <button class="btn ghost" type="button" data-action="load">📂 Laden</button>
+      </div>
+    </div>
+    <div id="step-meter" class="meter" data-meter role="status">
+      <div class="meter-bar"><div class="meter-fill"></div></div>
+      <span class="meter-text"></span>
+    </div>
+    <div class="flag start">Los geht's!</div>
+    <ol id="program" class="blocks" aria-label="Programm"></ol>
+    <div id="empty" class="empty">Hier ist noch nichts.<br>Ziehe Bausteine hierher!</div>
+    <div class="flag end">🏁 Ziel</div>
+  </section>
+
+  <section class="card advanced" aria-labelledby="h-advanced">
+    <div class="program-head">
+      <h2 id="h-advanced">Dein Programm (Profi)</h2>
+      <div class="modes" role="group" aria-label="Ansicht">
+        <button type="button" class="mode-btn" data-view="blocks" aria-pressed="true" title="Bausteine wie bei Scratch">Blöcke</button>
+        <button type="button" class="mode-btn" data-view="flow" aria-pressed="false" title="Dasselbe Programm als Ablauf mit Pfeilen">Ablauf</button>
+      </div>
+      <div class="actions">
+        <button class="btn go" type="button" data-action="run">▶ Start</button>
+        <button class="btn stop" type="button" data-action="stop">■ Stopp</button>
+        <button id="btn-adv-clear" class="btn ghost" type="button">🗑 Neu</button>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-action="save">💾 Speichern</button>
+        <button class="btn ghost" type="button" data-action="load">📂 Laden</button>
+      </div>
+    </div>
+    <div id="adv-meter" class="meter" data-meter role="status">
+      <div class="meter-bar"><div class="meter-fill"></div></div>
+      <span class="meter-text"></span>
+    </div>
+    <div id="blockly" class="blockly-area"><p class="hint">Lade Bausteine …</p></div>
+    <div id="flow" class="flow-area"></div>
+  </section>
+
+  <div class="right">
+  <section class="card remote" aria-labelledby="h-remote">
+    <h2 id="h-remote">Fernsteuerung</h2>
+    <p class="hint">Pfeiltasten gedrückt halten zum Fahren, Leertaste zum Hupen.</p>
+    <div class="pad">
+      <button type="button" class="key" data-remote="up" style="grid-area: up" aria-label="Vorwärts">▲</button>
+      <button type="button" class="key" data-remote="left" style="grid-area: left" aria-label="Links">◀</button>
+      <button type="button" class="key" data-remote="down" style="grid-area: down" aria-label="Rückwärts">▼</button>
+      <button type="button" class="key" data-remote="right" style="grid-area: right" aria-label="Rechts">▶</button>
+      <button type="button" class="key horn" data-remote="horn" style="grid-area: horn">📯 Hupe</button>
+    </div>
+    <p id="pad-hint" class="hint pad-hint"></p>
+  </section>
+
+  <section class="card live" aria-labelledby="h-live">
+    <h2 id="h-live">Was der Roboter sieht</h2>
+    <dl class="sensors">
+      <div><dt>Linie</dt><dd><span class="eye" id="s-line-left" title="linker Sensor"></span><span class="eye" id="s-line-right" title="rechter Sensor"></span></dd></div>
+      <div><dt>Abstand</dt><dd id="s-distance">–</dd></div>
+      <div><dt>Helligkeit</dt><dd id="s-light">–</dd></div>
+      <div><dt>Taste</dt><dd id="s-button">–</dd></div>
+      <div><dt>Motoren</dt><dd id="s-motors">–</dd></div>
+      <div><dt>Stoppuhr</dt><dd id="s-timer">–</dd></div>
+    </dl>
+    <dl id="vars" class="sensors vars" hidden></dl>
+  </section>
+  </div>
+</main>
+
+<dialog id="dlg-save">
+  <form method="dialog" class="dlg" id="save-form">
+    <h2 id="dlg-save-title">Programm speichern</h2>
+    <label class="field">Name
+      <input type="text" id="save-name" maxlength="40" autocomplete="off" placeholder="z. B. Quadrat fahren">
+    </label>
+    <fieldset>
+      <legend>Symbol</legend>
+      <div id="symbol-picker" class="symbols" role="radiogroup" aria-label="Symbol"></div>
+    </fieldset>
+    <p id="dlg-save-msg" class="msg" role="status"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn go" id="save-confirm">Speichern</button>
+      <button type="submit" class="btn ghost">Abbrechen</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-load">
+  <form method="dialog" class="dlg">
+    <h2>Meine Programme</h2>
+    <ul id="saved-list" class="saved" aria-label="Gespeicherte Programme"></ul>
+    <p id="dlg-load-msg" class="msg" role="status"></p>
+    <div class="dlg-actions">
+      <button type="submit" class="btn ghost">Schließen</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-connect">
+  <form method="dialog" class="dlg">
+    <h2>Mit dem Roboter verbinden</h2>
+
+    <fieldset>
+      <legend>Per WLAN (Pico)</legend>
+      <div class="row">
+        <select id="wifi-select" aria-label="Gefundene Roboter im WLAN"><option value="">– erst suchen –</option></select>
+        <button type="button" class="btn small" id="wifi-scan">Suchen</button>
+      </div>
+      <div class="row">
+        <input id="wifi-address" placeholder="oder Adresse eingeben: 192.168.1.50" autocomplete="off" spellcheck="false">
+      </div>
+      <button type="button" class="btn go" id="connect-wifi">Verbinden</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Per USB-Kabel</legend>
+      <div class="row">
+        <select id="port-select" aria-label="USB-Anschluss"></select>
+        <button type="button" class="btn small" id="port-refresh">Neu suchen</button>
+      </div>
+      <button type="button" class="btn go" id="connect-serial">Verbinden</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Per Bluetooth</legend>
+      <div class="row">
+        <select id="ble-select" aria-label="Bluetooth-Geräte"><option value="">– erst suchen –</option></select>
+        <button type="button" class="btn small" id="ble-scan">Suchen (6 s)</button>
+      </div>
+      <div class="row">
+        <input id="ble-address" placeholder="oder Adresse eingeben: AA:BB:CC:DD:EE:FF" autocomplete="off" spellcheck="false">
+      </div>
+      <button type="button" class="btn go" id="connect-ble">Verbinden</button>
+      <p class="hint">Der Roboter muss eingeschaltet sein. Bluetooth darf nicht schon mit einem anderen Gerät oder dem KDE-Bluetooth-Symbol verbunden sein.</p>
+    </fieldset>
+
+    <p id="dlg-connect-msg" class="msg" role="status"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" id="disconnect">Trennen</button>
+      <button type="submit" class="btn ghost">Schließen</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-cal">
+  <form method="dialog" class="dlg wide" id="cal-form">
+    <h2>Kalibrierung</h2>
+    <p class="hint">Stell den Roboter auf den Boden mit viel Platz. Teste jede Einstellung und miss nach – dann passen „Schritt“ und „Drehung“ genau.</p>
+
+    <fieldset>
+      <legend>1 · Tempo</legend>
+      <label class="slider">Fahren <input type="range" name="speed" min="25" max="100" step="1"><output></output></label>
+      <label class="slider">Drehen <input type="range" name="turn_speed" min="25" max="100" step="1"><output></output></label>
+      <p class="hint">Unter ca. 30 % bewegen sich die Räder nicht. Schwache Batterien? Dann das Tempo erhöhen oder neue Batterien einlegen.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>2 · Ein Schritt vorwärts</legend>
+      <label class="slider">Dauer <input type="range" name="forward_ms" min="100" max="3000" step="10"><output></output></label>
+      <div class="row">
+        <button type="button" class="btn small" data-test="forward">▶ 1 Schritt testen</button>
+        <label class="inline">Ein Schritt soll <input type="number" name="step_cm" min="1" max="200" step="1"> cm lang sein</label>
+      </div>
+      <div class="row">
+        <label class="inline">Gemessen: <input type="number" id="meas-dist" min="1" max="500" step="0.5"> cm</label>
+        <button type="button" class="btn small" data-fit="dist">Dauer anpassen</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3 · Geradeaus fahren</legend>
+      <label class="slider">Korrektur <input type="range" name="trim" min="-30" max="30" step="1"><output></output></label>
+      <div class="row">
+        <button type="button" class="btn small" data-test="straight">▶ 3 Schritte testen</button>
+        <span class="hint">Fährt er nach <b>rechts</b> weg → Regler nach <b>rechts</b>. Nach links weg → nach links.</span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>4 · Drehen (90°)</legend>
+      <label class="slider">Links <input type="range" name="turn_left_ms" min="50" max="1500" step="5"><output></output></label>
+      <div class="row">
+        <button type="button" class="btn small" data-test="left">▶ 90° links testen</button>
+        <label class="inline">Gedreht um <input type="number" id="meas-left" min="1" max="720" step="1"> °</label>
+        <button type="button" class="btn small" data-fit="left">anpassen</button>
+      </div>
+      <label class="slider">Rechts <input type="range" name="turn_right_ms" min="50" max="1500" step="5"><output></output></label>
+      <div class="row">
+        <button type="button" class="btn small" data-test="right">▶ 90° rechts testen</button>
+        <label class="inline">Gedreht um <input type="number" id="meas-right" min="1" max="720" step="1"> °</label>
+        <button type="button" class="btn small" data-fit="right">anpassen</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>5 · Sonstiges</legend>
+      <label class="slider">Pause nach jeder Bewegung <input type="range" name="settle_ms" min="0" max="500" step="10"><output></output></label>
+      <label class="check"><input type="checkbox" name="reverse"> Vorne ist die andere Seite (Roboter fährt „rückwärts“, wenn er vorwärts soll)</label>
+    </fieldset>
+
+    <p id="dlg-cal-msg" class="msg" role="status"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn stop" id="cal-stop">■ Stopp</button>
+      <button type="button" class="btn go" id="cal-save">Speichern</button>
+      <button type="submit" class="btn ghost">Schließen</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="flow.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

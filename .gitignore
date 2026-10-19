@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+
+# project-local Arduino toolchain (~450 MB), created by tools/setup.sh
+tools/bin/
+tools/arduino-data/
+tools/arduino-user/
+
+# machine-specific / secret / personal
+server/settings.json
+server/calibration.json
+server/programs.json
+pico_bridge/wifi_config.py
+sim/tty
+factory/backup/
+
+# kept locally, not published
+tools/disabled_makeblock_files/
+docs/legacy/
+docs/wip/
