@@ -20,7 +20,7 @@ Source of truth for opcodes and the wire format: [`server/bytecode.py`](../serve
 * **Values:** 32-bit signed integers. Literals are encoded in 1, 2 or 4 bytes. Division by zero gives 0
   (a kids' program shouldn't crash on it).
 * **Stack:** 16 entries, for expressions. Overflow/underflow is a runtime fault.
-* **Calls:** functions (saved programs used as blocks, Profi "Meine Blöcke") are compiled once and called;
+* **Calls:** functions (saved programs used as blocks, "My Blocks" in advanced mode) are compiled once and called;
   return stack of 8. The compiler refuses recursion and deeper nesting, so the runtime check is only a
   safety net. Parameters are hidden variables the call sets – possible because there is no recursion.
 * **Variables:** up to 16, all 0 when a program starts. The compiler assigns the slots.
@@ -58,8 +58,8 @@ Source of truth for opcodes and the wire format: [`server/bytecode.py`](../serve
 
 | `NOTE` | 39 | hz u16, ms u16 | | play a tone and wait until it's over |
 
-`MOVE` is the compact form of "Vorwärts 2 Schritte" etc. (8 bytes; the generic form would be ~19), `NOTE` of
-"Hupen" (5 bytes instead of 11).
+`MOVE` is the compact form of "Forward 2 steps" etc. (8 bytes; the generic form would be ~19), `NOTE` of
+"Honk" (5 bytes instead of 11).
 
 Sensors: 0 line follower raw (bit1 = sensor 1 on D9, bit0 = sensor 2 on D10; 1 = white), 1 / 2 the single
 line sensors, 3 distance cm (1–400, 400 = nothing in range), 4 light 0–1023, 5 button 0/1, 6 timer ms,

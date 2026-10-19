@@ -1,76 +1,73 @@
 # mbot-flow
 
-Self-hosted block and flowchart programming for the classic Makeblock **mBot** (mCore board), made for kids.
-A small server on your PC serves a German web GUI. Programs are compiled to bytecode and run **on the robot
-itself** by a custom firmware, so it reacts to its sensors instantly, however slow the link is.
+Self-hosted block and flowchart programming for the classic Makeblock **mBot** (mCore), made for kids. A small
+server on your PC serves the web GUI (English and German); programs are compiled to bytecode and run **on the
+robot** by a custom firmware.
 
 ![The three editors: simple blocks, Blockly and the flowchart](docs/images/editors.png)
 
-```
- browser (tablet, PC)  ──HTTP──►  server (PC)  ──USB / WiFi / BLE──►  mBot: bytecode VM firmware
-                       ◄── live ──             ◄──── telemetry ─────
-```
+## Why?
 
-## What it gives you
+- **Reaction time.** With the stock firmware (mBlock live mode) the program runs in the app: every sensor check is
+  a round trip app → robot → app, too slow to follow a line. Here the robot runs the program and reads its sensors
+  itself.
+- **Learning curve.** Blockly's nested blocks are hard for kids who have never written code. The simple mode is a
+  plain list of big blocks; the flowchart shows branches and loops as arrows.
+- **Programs on the robot.** The stock firmware can only run a program on its own if mBlock flashes it as new
+  firmware. This firmware receives programs over the link, so storing one on the robot is possible
+  (not implemented yet).
 
-- **Two levels.** *Einfach*: big blocks in a list (forward, turn, wait, honk) for kids who can't read much
-  yet. *Profi*: loops, conditions, sensors, variables and own blocks with inputs.
-- **Blocks or flowchart.** A Profi program is shown either as Scratch-like blocks or as a flowchart that lays
-  itself out, with forks, loops, drag and drop and touch. Switch any time; it's the same program.
-- **Runs on the robot.** "Drive until the line is lost" reacts within microseconds, not a WiFi round trip. The
-  page shows live which block is running and what the sensors see.
-- **Programs as blocks.** Every saved program becomes a block that other programs can use.
-- **Remote control.** Arrow keys, on-screen pad or a game controller; the robot stops by itself if the link
-  dies.
-- **Calibration.** A guided dialog makes "1 step" and "90°" true for your robot (the mBot has no encoders).
-- **Works without the robot.** A simulator with a line to follow and walls.
-- **No cloud, no account.** Python standard library plus `pyserial`/`bleak`; the GUI is plain HTML/JS and
-  works offline.
+## Features
+
+- **Simple mode:** forward, turn, wait, honk; saved programs become blocks.
+- **Advanced mode:** loops, conditions, sensors, variables, own blocks with inputs – shown as Blockly blocks or as
+  a self-arranging flowchart (touch-friendly, undo). Both views edit the same program.
+- **Live view:** the running block is highlighted; sensors, motors and variables update as the robot drives.
+- **Remote control:** arrow keys, on-screen pad or a game controller; the robot stops by itself if the link drops.
+- **Connections:** USB, WiFi through a [Pico W in the Bluetooth socket](docs/pico-bridge.md), or Bluetooth LE.
+- **Calibration** for steps and turns (the mBot has no encoders), and a **simulator** for working without the robot.
+- No cloud, no account, no build step.
 
 ## Getting started
 
-You need an mBot (mCore), a USB cable, Linux (or macOS, untested) with [uv](https://docs.astral.sh/uv/), and a
-browser.
+Needs an mBot (mCore), a USB cable, Linux (macOS untested) with [uv](https://docs.astral.sh/uv/), and a browser.
 
 ```sh
-tools/setup.sh                 # project-local Arduino toolchain (~450 MB, inside tools/)
-./flash.sh /dev/ttyUSB0        # pull the Bluetooth module first – see docs/flashing.md
-./start.sh                     # then open http://localhost:8000
+tools/setup.sh                 # Arduino toolchain inside tools/ (~450 MB)
+./flash.sh /dev/ttyUSB0        # Bluetooth module unplugged, see docs/flashing.md
+./start.sh                     # open http://localhost:8000
 ```
 
-Then run **⚙ Kalibrierung** once with the robot on the floor.
+Then run **⚙ Calibration** once with the robot on the floor.
 
 | | |
 |---|---|
-| [docs/flashing.md](docs/flashing.md) | toolchain, flashing, backing up and restoring Makeblock's firmware |
-| [docs/usage.md](docs/usage.md) | connecting (USB, WiFi, BLE, simulator), calibration, the modes, remote control |
-| [docs/architecture.md](docs/architecture.md) | how it works: server, compiler, data, HTTP API, development |
-| [docs/vm.md](docs/vm.md) | the VM firmware: instruction set and wire protocol |
-| [pico_bridge/wiring.html](pico_bridge/wiring.html) | a Raspberry Pi Pico W as WiFi bridge in the Bluetooth module's socket |
+| [docs/flashing.md](docs/flashing.md) | toolchain, flashing, restoring Makeblock's firmware |
+| [docs/usage.md](docs/usage.md) | connecting, calibration, the modes, remote control |
+| [docs/pico-bridge.md](docs/pico-bridge.md) | WiFi bridge with a Raspberry Pi Pico W |
+| [docs/architecture.md](docs/architecture.md) | how it works, HTTP API, development |
+| [docs/vm.md](docs/vm.md) | firmware VM: instruction set and wire protocol |
 
 ## Limitations
 
-- The GUI is German only.
-- Flashing needs the Bluetooth module unplugged; over-the-air flashing isn't possible
+- Flashing needs the Bluetooth module unplugged; flashing over the air isn't possible
   ([why](docs/flashing.md#no-flashing-over-bluetooth)).
-- BLE is implemented but not tested with this firmware yet; USB and the Pico W bridge are.
 - Distances and turns are timed, so they drift as the batteries run down.
-- No login: open it to the network (`--host 0.0.0.0`) only on a network you trust.
-- Unused so far: the onboard RGB LEDs, the IR receiver, storing a program on the robot to run without a PC.
+- No login: only open the server to the network (`--host 0.0.0.0`) on a network you trust.
+- Not used yet: the onboard RGB LEDs and the IR receiver.
 
 ## Credits
 
-- **[Blockly](https://github.com/google/blockly)** and
-  **[@blockly/continuous-toolbox](https://github.com/google/blockly-samples)** by Google (Apache-2.0),
-  vendored in `web/vendor/blockly/`.
-- **[Makeblock-Libraries](https://github.com/Makeblock-official/Makeblock-Libraries)** – the pin map in
-  `MeMCore.h`, and the original firmware in [`factory/`](factory/README.md) (CC BY-SA 3.0).
-- **[mCore schematic](https://github.com/Makeblock-official/mBot/blob/master/pcb/mCore.pdf)** – why flashing
-  needs the Bluetooth module out.
+- [Blockly](https://github.com/google/blockly) and
+  [@blockly/continuous-toolbox](https://github.com/google/blockly-samples) by Google (Apache-2.0), vendored in
+  `web/vendor/blockly/`.
+- [Makeblock-Libraries](https://github.com/Makeblock-official/Makeblock-Libraries): the pin map and the original
+  firmware in [`factory/`](factory/README.md) (CC BY-SA 3.0).
+- [mCore schematic](https://github.com/Makeblock-official/mBot/blob/master/pcb/mCore.pdf).
 
-Makeblock, mBot and mBlock are trademarks of Makeblock Co., Ltd. This project is not affiliated with or
-endorsed by Makeblock, and comes with no warranty. Flashing replaces the robot's firmware; it can be restored
-as described in [docs/flashing.md](docs/flashing.md#getting-the-original-firmware-back).
+Makeblock, mBot and mBlock are trademarks of Makeblock Co., Ltd. This project is not affiliated with or endorsed
+by Makeblock, and comes with no warranty. Flashing replaces the robot's firmware;
+[it can be restored](docs/flashing.md#getting-the-original-firmware-back).
 
 ## Written by an AI
 
@@ -79,5 +76,4 @@ directed and tested on real hardware by a human. It runs well, but nobody has au
 
 ## License
 
-MIT, see [LICENSE](LICENSE). Third-party parts keep their own licenses: Blockly (Apache-2.0), Makeblock's
-firmware in `factory/` (CC BY-SA 3.0).
+MIT, see [LICENSE](LICENSE). Third-party parts keep their own licenses (see Credits).

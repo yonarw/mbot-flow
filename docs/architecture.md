@@ -1,23 +1,20 @@
 # How it works
 
 ```
- browser (German GUI)   ──HTTP──►  server/mbot_server.py   ──USB / WiFi (Pico) / BLE──►  firmware/mbot_vm
-   web/  Einfach | Profi           compiler.py: blocks → bytecode                         runs the bytecode,
+ browser                ──HTTP──►  server/mbot_server.py   ──USB / WiFi (Pico) / BLE──►  firmware/mbot_vm
+   web/  simple | advanced         compiler.py: blocks → bytecode                         runs the bytecode,
          ◄──── live (SSE) ────     (uses calibration.json)       ◄──── telemetry ────     reads the sensors
 ```
 
-The page sends a program to the server, which compiles it to bytecode and uploads it to the robot **as a
-whole**. A small virtual machine runs it on the robot itself, sensors included, so link latency only matters
-while uploading – never between moves, or between "see the line" and "steer". The robot streams back where it
-is in the program and what its sensors see, and the page shows that live.
-
-The VM, its instruction set and the wire protocol: [vm.md](vm.md).
+The server compiles a program to bytecode and uploads it **as a whole**; a small VM runs it on the robot,
+sensors included. Link latency only matters while uploading. The robot streams back its position in the program
+and its sensor values, and the page shows them live. VM, instruction set and wire protocol: [vm.md](vm.md).
 
 ## Pieces
 
 | Path | What |
 |---|---|
-| `web/` | The GUI: plain HTML/CSS/JS, no build step, works offline. `app.js` simple mode and the shell, `advanced.js` Profi block definitions (workspace → syntax tree), `flow.js` the flowchart view |
+| `web/` | The GUI: plain HTML/CSS/JS, no build step, works offline. `i18n.js` language, `app.js` simple mode and the shell, `advanced.js` Blockly blocks (workspace → syntax tree), `flow.js` the flowchart |
 | `web/vendor/blockly/` | Blockly 12.5.1 + continuous toolbox, vendored and loaded on demand ([README](../web/vendor/blockly/README.md)) |
 | `server/mbot_server.py` | HTTP API, live events (SSE), serial/WiFi/BLE link, autoconnect, program store, simple blocks → syntax tree |
 | `server/compiler.py` | syntax tree → bytecode, using the calibration for timed moves |
@@ -27,19 +24,27 @@ The VM, its instruction set and the wire protocol: [vm.md](vm.md).
 | `pico_bridge/` | MicroPython WiFi ↔ serial bridge for a Pico W in the Bluetooth module's socket |
 | `factory/`, `restore_factory.sh` | Makeblock's original firmware sources, to go back |
 | `tools/` | `setup.sh` (toolchain), `acli` (project-local arduino-cli), `read_flash.py` (flash backup) |
-| `tests/` | compiler, VM, program store and autoconnect tests; a check that the firmware's opcode table matches `bytecode.py` |
+| `tests/` | compiler, VM, program store, autoconnect and translation tests; a check that the firmware's opcode table matches `bytecode.py` |
 
 ## One syntax tree for everything
 
-Both modes produce the same syntax tree: the simple mode's block list is turned into it by the server
-(`blocks_to_ast`), Profi's Blockly workspace and flowchart by the page. The compiler only knows the tree.
+The simple mode's block list becomes a syntax tree on the server (`blocks_to_ast`); the Blockly workspace and
+the flowchart become one in the page. The compiler only knows the tree.
 
-Switching Profi between **Blöcke** and **Ablauf** converts through that tree, keeping every statement's id, so
-the running-block highlight and compile errors find their block in either view. Going back without a change
-keeps the other view's own document (Blockly's positions).
+Switching between Blocks and Flowchart converts through the tree and keeps every statement's id, so the
+running-block highlight and compile errors work in both views. Switching back without a change keeps the other
+view's document as it was.
 
-Saved programs used as blocks are compiled once as functions and called (`CALL`/`RET`), not inlined. The
-server expands them by name when a program runs, refuses recursion, and limits nesting to 8.
+Saved programs used as blocks are compiled once as functions and called (`CALL`/`RET`). The server expands them
+by name when a program runs, refuses recursion and limits nesting to 8.
+
+## Languages
+
+German is the source text in the code; `web/i18n/en.json` maps it to English and is shared by page and server.
+The page wraps its texts in `tr("…")` and translates the static HTML on load; the server renders its messages
+(`Msg`, `server/i18n.py`) in the language the page sends (`X-Lang` header, `?lang=` for the event stream).
+`tests/test_i18n.py` fails when a text has no translation or a translation is unused. Blockly's own texts come
+from `vendor/blockly/msg/{de,en}.js`.
 
 ## Data
 

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="330" viewBox="0 0 440 330" role="img" aria-label="Pico WH top view with the USB plug at the top: pins 1 GP0, 2 GP1 and 3 GND are the top three on the left; pins 40 VBUS, 39 VSYS and 38 GND are the top three on the right.">
+  <style>text { font-family: "IBM Plex Mono", ui-monospace, monospace; fill: #18222c; } .lbl { font-family: system-ui, sans-serif; }</style>
+  <rect width="100%" height="100%" rx="12" fill="#ffffff"/>
+        <rect x="150" y="34" width="140" height="282" rx="8" fill="#1d7a4c"/>
+        <rect x="192" y="14" width="56" height="30" rx="4" fill="#c7ced6" stroke="#18222c" stroke-width="1.5"/>
+        <text x="220" y="62" text-anchor="middle" class="lbl" font-size="12" style="fill:#ffffff">USB</text>
+        <g id="pins-left">
+          <circle cx="160" cy="56" r="5.5" fill="#e58a00" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="160" cy="70" r="5.5" fill="#2766d6" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="160" cy="84" r="5.5" fill="#23272b" stroke="#fff" stroke-width="1.5"/>
+        </g>
+        <g fill="#ffffff" opacity="0.45">
+          <circle cx="160" cy="98" r="4"/><circle cx="160" cy="112" r="4"/><circle cx="160" cy="126" r="4"/><circle cx="160" cy="140" r="4"/><circle cx="160" cy="154" r="4"/><circle cx="160" cy="168" r="4"/><circle cx="160" cy="182" r="4"/><circle cx="160" cy="196" r="4"/><circle cx="160" cy="210" r="4"/><circle cx="160" cy="224" r="4"/><circle cx="160" cy="238" r="4"/><circle cx="160" cy="252" r="4"/><circle cx="160" cy="266" r="4"/><circle cx="160" cy="280" r="4"/><circle cx="160" cy="294" r="4"/>
+          <circle cx="280" cy="98" r="4"/><circle cx="280" cy="112" r="4"/><circle cx="280" cy="126" r="4"/><circle cx="280" cy="140" r="4"/><circle cx="280" cy="154" r="4"/><circle cx="280" cy="168" r="4"/><circle cx="280" cy="182" r="4"/><circle cx="280" cy="196" r="4"/><circle cx="280" cy="210" r="4"/><circle cx="280" cy="224" r="4"/><circle cx="280" cy="238" r="4"/><circle cx="280" cy="252" r="4"/><circle cx="280" cy="266" r="4"/><circle cx="280" cy="280" r="4"/><circle cx="280" cy="294" r="4"/>
+        </g>
+        <circle cx="280" cy="56" r="5.5" fill="#ffffff" stroke="#566573" stroke-width="1.5"/>
+        <circle cx="280" cy="70" r="5.5" fill="#d63a2f" stroke="#fff" stroke-width="1.5"/>
+        <circle cx="280" cy="84" r="5.5" fill="#23272b" stroke="#fff" stroke-width="1.5"/>
+        <g font-size="13" font-weight="600" text-anchor="end">
+          <text x="140" y="60" style="fill:#e58a00">1 · GP0</text>
+          <text x="140" y="74" style="fill:#2766d6">2 · GP1</text>
+          <text x="140" y="88">3 · GND</text>
+        </g>
+        <g font-size="13" font-weight="600">
+          <text x="300" y="60" style="fill:#566573">40 · VBUS (unused)</text>
+          <text x="300" y="74" style="fill:#d63a2f">39 · VSYS</text>
+          <text x="300" y="88">38 · GND</text>
+        </g>
+        <text x="220" y="190" text-anchor="middle" class="lbl" font-size="12" style="fill:#ffffff">top view</text>
+      </svg>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="410" viewBox="0 0 760 410" role="img" aria-label="Wiring diagram: mBot socket P5 pin 1 (5 V) to Pico VSYS pin 39, pin 2 (GND) to Pico GND pin 38, pin 3 (RX) from Pico GP0 pin 1, pin 4 (TX) through resistor R to Pico GP1 pin 2, with two resistors R in series from GP1 to GND (Pico pin 3).">
+  <style>text { font-family: "IBM Plex Mono", ui-monospace, monospace; fill: #18222c; } .lbl { font-family: system-ui, sans-serif; }</style>
+  <rect width="100%" height="100%" rx="12" fill="#ffffff"/>
+        <defs>
+          <marker id="arrTx" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#e58a00"/></marker>
+          <marker id="arrRx" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#2766d6"/></marker>
+        </defs>
+
+        <!-- mBot socket -->
+        <rect x="30" y="40" width="160" height="230" rx="10" fill="#1f6fb8"/>
+        <text x="110" y="28" text-anchor="middle" class="lbl" font-size="15" font-weight="700">mBot · socket P5</text>
+        <text x="110" y="292" text-anchor="middle" class="lbl" font-size="13" fill="#566573" style="fill:#566573">where the BT module was</text>
+        <g font-size="14" font-weight="600">
+          <text x="46" y="85" style="fill:#fff">1 · 5V</text>
+          <text x="46" y="135" style="fill:#fff">2 · GND</text>
+          <text x="46" y="185" style="fill:#fff">3 · RX (D0)</text>
+          <text x="46" y="235" style="fill:#fff">4 · TX (D1)</text>
+        </g>
+        <g fill="#fff"><circle cx="190" cy="80" r="6"/><circle cx="190" cy="130" r="6"/><circle cx="190" cy="180" r="6"/><circle cx="190" cy="230" r="6"/></g>
+
+        <!-- Pico -->
+        <rect x="570" y="40" width="160" height="230" rx="10" fill="#1d7a4c"/>
+        <text x="650" y="28" text-anchor="middle" class="lbl" font-size="15" font-weight="700">Pico WH</text>
+        <g font-size="14" font-weight="600" text-anchor="end">
+          <text x="714" y="85" style="fill:#ffffff">VSYS · 39</text>
+          <text x="714" y="135" style="fill:#ffffff">GND · 38</text>
+          <text x="714" y="185" style="fill:#ffffff">GP0 · 1</text>
+          <text x="714" y="235" style="fill:#ffffff">GP1 · 2</text>
+        </g>
+        <g fill="#fff"><circle cx="570" cy="80" r="6"/><circle cx="570" cy="130" r="6"/><circle cx="570" cy="180" r="6"/><circle cx="570" cy="230" r="6"/></g>
+
+        <!-- wires -->
+        <line x1="196" y1="80" x2="564" y2="80" stroke="#d63a2f" stroke-width="5" stroke-linecap="round"/>
+        <text x="380" y="70" text-anchor="middle" class="lbl" font-size="14" style="fill:#d63a2f" font-weight="700">5 V power</text>
+
+        <line x1="196" y1="130" x2="564" y2="130" stroke="#23272b" stroke-width="5" stroke-linecap="round"/>
+        <text x="380" y="120" text-anchor="middle" class="lbl" font-size="14" font-weight="700">GND</text>
+
+        <line x1="564" y1="180" x2="204" y2="180" stroke="#e58a00" stroke-width="5" stroke-linecap="round" marker-end="url(#arrTx)"/>
+        <text x="380" y="170" text-anchor="middle" class="lbl" font-size="14" style="fill:#e58a00" font-weight="700">Pico sends → mBot (3.3 V, direct wire is fine)</text>
+
+        <!-- TX line with divider -->
+        <polyline points="196,230 262,230" fill="none" stroke="#2766d6" stroke-width="5" stroke-linecap="round"/>
+        <rect x="262" y="218" width="70" height="24" rx="3" fill="#ffffff" stroke="#18222c" stroke-width="2.5"/>
+        <text x="297" y="235" text-anchor="middle" font-size="14" font-weight="600">R</text>
+        <polyline points="332,230 556,230" fill="none" stroke="#2766d6" stroke-width="5" stroke-linecap="round" marker-end="url(#arrRx)"/>
+        <text x="225" y="220" text-anchor="middle" font-size="12" style="fill:#2766d6" font-weight="600">5 V</text>
+        <circle cx="440" cy="230" r="6.5" fill="#2766d6"/>
+        <text x="500" y="220" text-anchor="middle" font-size="12" style="fill:#2766d6" font-weight="600">≈ 3.3 V</text>
+
+        <line x1="440" y1="236" x2="440" y2="262" stroke="#2766d6" stroke-width="4"/>
+        <rect x="428" y="262" width="24" height="50" rx="3" fill="#ffffff" stroke="#18222c" stroke-width="2.5"/>
+        <text x="462" y="292" font-size="14" font-weight="600">R</text>
+        <line x1="440" y1="312" x2="440" y2="322" stroke="#23272b" stroke-width="4"/>
+        <rect x="428" y="322" width="24" height="50" rx="3" fill="#ffffff" stroke="#18222c" stroke-width="2.5"/>
+        <text x="462" y="352" font-size="14" font-weight="600">R</text>
+        <line x1="440" y1="372" x2="440" y2="384" stroke="#23272b" stroke-width="4"/>
+        <g stroke="#23272b" stroke-width="3.5" stroke-linecap="round">
+          <line x1="422" y1="384" x2="458" y2="384"/><line x1="429" y1="392" x2="451" y2="392"/><line x1="436" y1="400" x2="444" y2="400"/>
+        </g>
+        <text x="470" y="398" class="lbl" font-size="14" font-weight="700">GND → Pico pin 3</text>
+
+        <text x="40" y="340" class="lbl" font-size="14" font-weight="700">All three R: same value</text>
+        <text x="40" y="360" class="lbl" font-size="14" style="fill:#566573">anything from 220 Ω to 22 kΩ,</text>
+        <text x="40" y="380" class="lbl" font-size="14" style="fill:#566573">e.g. 3 × 1 kΩ or 3 × 10 kΩ</text>
+      </svg>
