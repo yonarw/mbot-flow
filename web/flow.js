@@ -61,33 +61,33 @@ window.Flow = (() => {
   };
 
   const PALETTE = [
-    { name: "Bewegung", cat: "move", items: [
-      ["fahre 1 Schritt", () => ({ do: "move", dir: "forward", steps: 1 })],
-      ["drehe 90°", () => ({ do: "turn", dir: "left", deg: 90 })],
-      ["fahre los", () => ({ do: "drive", dir: "forward", power: num(50) })],
-      ["Motoren einzeln", () => ({ do: "motors", left: num(50), right: num(50) })],
-      ["halte an", () => ({ do: "stop" })]] },
-    { name: "Klang", cat: "sound", items: [
-      ["spiele Ton", () => ({ do: "beep", hz: num(880), sec: num(0.25), wait: true })],
-      ["starte Ton", () => ({ do: "beep", hz: num(440), sec: num(0.5), wait: false })]] },
-    { name: "Steuerung", cat: "control", items: [
-      ["warte 1 Sek.", () => ({ do: "wait", sec: num(1) })],
-      ["Frage: ja oder nein?", () => ({ do: "if", cond: { k: "line", side: "left", black: true }, then: [], else: [] })],
-      ["wiederhole 4 mal", () => ({ do: "repeat", times: num(4), body: [] })],
-      ["wiederhole fortlaufend", () => ({ do: "forever", body: [] })],
-      ["wiederhole bis …?", () => ({ do: "repeat_until", cond: { k: "cmp", a: "distance", fn: "<", v: num(10) }, body: [] })],
-      ["warte bis …?", () => ({ do: "wait_until", cond: { k: "button", pressed: true } })],
-      ["beende Programm", () => ({ do: "end" })]] },
-    { name: "Sensoren", cat: "sensor", hint: "Werte: zieh sie in ein Feld oder auf eine Frage ⬡.", values: [
-      ["📏 Abstand", () => ({ k: "sensor", name: "distance" })],
-      ["💡 Helligkeit", () => ({ k: "sensor", name: "light" })],
-      ["⏱ Stoppuhr", () => ({ k: "sensor", name: "timer" })]], items: [
-      ["Stoppuhr auf 0", () => ({ do: "reset_timer" })]] },
-    { name: "Rechnen", cat: "math", values: [
-      ["🎲 Zufall 1 bis 10", () => ({ k: "random", lo: 1, hi: 10 })]], items: [] },
-    { name: "Variablen", cat: "vars", items: [
-      ["setze Variable", () => ({ do: "set", var: firstVar(), value: num(0) }), "var"],
-      ["ändere Variable", () => ({ do: "change", var: firstVar(), by: num(1) }), "var"]] },
+    { name: tr("Bewegung"), cat: "move", items: [
+      [tr("fahre 1 Schritt"), () => ({ do: "move", dir: "forward", steps: 1 })],
+      [tr("drehe 90°"), () => ({ do: "turn", dir: "left", deg: 90 })],
+      [tr("fahre los"), () => ({ do: "drive", dir: "forward", power: num(50) })],
+      [tr("Motoren einzeln"), () => ({ do: "motors", left: num(50), right: num(50) })],
+      [tr("halte an"), () => ({ do: "stop" })]] },
+    { name: tr("Klang"), cat: "sound", items: [
+      [tr("spiele Ton"), () => ({ do: "beep", hz: num(880), sec: num(0.25), wait: true })],
+      [tr("starte Ton"), () => ({ do: "beep", hz: num(440), sec: num(0.5), wait: false })]] },
+    { name: tr("Steuerung"), cat: "control", items: [
+      [tr("warte 1 Sek."), () => ({ do: "wait", sec: num(1) })],
+      [tr("Frage: ja oder nein?"), () => ({ do: "if", cond: { k: "line", side: "left", black: true }, then: [], else: [] })],
+      [tr("wiederhole 4 mal"), () => ({ do: "repeat", times: num(4), body: [] })],
+      [tr("wiederhole fortlaufend"), () => ({ do: "forever", body: [] })],
+      [tr("wiederhole bis …?"), () => ({ do: "repeat_until", cond: { k: "cmp", a: "distance", fn: "<", v: num(10) }, body: [] })],
+      [tr("warte bis …?"), () => ({ do: "wait_until", cond: { k: "button", pressed: true } })],
+      [tr("beende Programm"), () => ({ do: "end" })]] },
+    { name: tr("Sensoren"), cat: "sensor", hint: tr("Werte: zieh sie in ein Feld oder auf eine Frage ⬡."), values: [
+      [tr("📏 Abstand"), () => ({ k: "sensor", name: "distance" })],
+      [tr("💡 Helligkeit"), () => ({ k: "sensor", name: "light" })],
+      [tr("⏱ Stoppuhr"), () => ({ k: "sensor", name: "timer" })]], items: [
+      [tr("Stoppuhr auf 0"), () => ({ do: "reset_timer" })]] },
+    { name: tr("Rechnen"), cat: "math", values: [
+      [tr("🎲 Zufall 1 bis 10"), () => ({ k: "random", lo: 1, hi: 10 })]], items: [] },
+    { name: tr("Variablen"), cat: "vars", items: [
+      [tr("setze Variable"), () => ({ do: "set", var: firstVar(), value: num(0) }), "var"],
+      [tr("ändere Variable"), () => ({ do: "change", var: firstVar(), by: num(1) }), "var"]] },
   ];
 
   // --- state ------------------------------------------------------------------------------------
@@ -113,8 +113,7 @@ window.Flow = (() => {
   const currentSeq = () => (view === null ? doc.main : doc.functions[view].body);
   const bodiesOf = s => (s.do === "if" ? [s.then, s.else] : LOOPS.has(s.do) ? [s.body] : []);
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-  const fmt = n => String(n).replace(".", ",");
-  const notify = msg => (typeof showError === "function" ? showError(msg) : alert(msg));
+    const notify = msg => (typeof showError === "function" ? showError(msg) : alert(msg));
   const cleanName = n => String(n || "").split(/\s+/).filter(Boolean).join(" ");
 
   function walk(arr, fn) {
@@ -263,7 +262,7 @@ window.Flow = (() => {
   }
 
   function toAst() {
-    if (!doc.main.length) throw new Error("Setz Bausteine unter ▶ Start – tippe auf ein ＋ und dann auf einen Baustein.");
+    if (!doc.main.length) throw new Error(tr("Setz Bausteine unter ▶ Start – tippe auf ein ＋ und dann auf einen Baustein."));
     return exportAst().ast;
   }
 
@@ -398,29 +397,29 @@ window.Flow = (() => {
     return input;
   }
 
-  const SENSOR_VALUES = { distance: "📏 Abstand", light: "💡 Helligkeit", timer: "⏱ Stoppuhr" };
+  const SENSOR_VALUES = { distance: tr("📏 Abstand"), light: tr("💡 Helligkeit"), timer: tr("⏱ Stoppuhr") };
   function valueText(v) {
-    if (v.k === "num") return fmt(v.n);
+    if (v.k === "num") return fmtNum(v.n);
     if (v.k === "var") return v.name || "?";
     if (v.k === "sensor") return SENSOR_VALUES[v.name];
     if (v.k === "expr") return exprText(v.e);
-    return `🎲 ${fmt(v.lo)} bis ${fmt(v.hi)}`;
+    return tr("🎲 {lo} bis {hi}", { lo: fmtNum(v.lo), hi: fmtNum(v.hi) });
   }
 
   // a formula as text, the way the "Blöcke" view says it
-  const SENSOR_TEXT = { distance: "Abstand", light: "Helligkeit", button: "Taste gedrückt", timer: "Stoppuhr (ms)",
-                        line_left: "Linie links schwarz", line_right: "Linie rechts schwarz" };
-  const OPS = { "+": "+", "-": "−", "*": "×", "/": "÷", "%": "Rest", "<": "<", ">": ">", "=": "=", "<=": "≤", ">=": "≥",
-                "!=": "≠", and: "und", or: "oder" };
+  const SENSOR_TEXT = { distance: tr("Abstand"), light: tr("Helligkeit"), button: tr("Taste gedrückt"), timer: tr("Stoppuhr (ms)"),
+                        line_left: tr("Linie links schwarz"), line_right: tr("Linie rechts schwarz") };
+  const OPS = { "+": "+", "-": "−", "*": "×", "/": "÷", "%": tr("Rest"), "<": "<", ">": ">", "=": "=", "<=": "≤", ">=": "≥",
+                "!=": "≠", and: tr("und"), or: tr("oder") };
   function exprText(e, nested = false) {
     if (e == null) return "?";
-    if (typeof e === "number") return fmt(e);
+    if (typeof e === "number") return fmtNum(e);
     switch (e.op) {
-      case "num": return fmt(e.value);
+      case "num": return fmtNum(e.value);
       case "var": return e.name || "?";
       case "sensor": return SENSOR_TEXT[e.name] || e.name;
-      case "random": return `Zufall ${exprText(e.lo, true)} bis ${exprText(e.hi, true)}`;
-      case "not": return `nicht ${exprText(e.a, true)}`;
+      case "random": return tr("Zufall {lo} bis {hi}", { lo: exprText(e.lo, true), hi: exprText(e.hi, true) });
+      case "not": return tr("nicht {a}", { a: exprText(e.a, true) });
       case "neg": return `−${exprText(e.a, true)}`;
       case "bin": {
         const text = `${exprText(e.a, true)} ${OPS[e.fn] || e.fn} ${exprText(e.b, true)}`;
@@ -439,12 +438,12 @@ window.Flow = (() => {
     let parts;
     if (v.k === "num") {
       parts = [numberInput(obj, key, { min, max, aria, wrap: n => num(n), unwrap: x => x.n }),
-        el("button", { type: "button", class: "f-more", "aria-label": `${aria}: Variable, Sensor oder Zufall`,
-                       title: "Variable, Sensor oder Zufallszahl", onclick: pop }, "▾")];
+        el("button", { type: "button", class: "f-more", "aria-label": tr("{what}: Variable, Sensor oder Zufall", { what: aria }),
+                       title: tr("Variable, Sensor oder Zufallszahl"), onclick: pop }, "▾")];
     } else if (v.k === "random") {
       parts = [el("span", { class: "f-chip f-random" },
-        el("button", { type: "button", class: "f-dice", "aria-label": `${aria}: ändern`, title: "Zufallszahl – antippen zum Ändern", onclick: pop }, "🎲"),
-        numberInput(v, "lo", { aria: "von", wrap: Math.round }), el("span", {}, "bis"), numberInput(v, "hi", { aria: "bis", wrap: Math.round }))];
+        el("button", { type: "button", class: "f-dice", "aria-label": tr("{what}: ändern", { what: aria }), title: tr("Zufallszahl – antippen zum Ändern"), onclick: pop }, "🎲"),
+        numberInput(v, "lo", { aria: tr("von"), wrap: Math.round }), el("span", {}, tr("bis")), numberInput(v, "hi", { aria: tr("bis"), wrap: Math.round }))];
     } else {
       parts = [el("button", { type: "button", class: `f-chip ${{ var: "f-var", sensor: "f-sensor", expr: "f-formula" }[v.k] || ""}`,
                               "aria-label": aria, title: v.k === "expr" ? FORMULA_HINT : null, onclick: pop }, valueText(v))];
@@ -465,13 +464,13 @@ window.Flow = (() => {
     else target.obj[target.key] = value;
     changed();
   }
-  const FORMULA_HINT = "Eine Formel aus der Blöcke-Ansicht. Antippen, um sie zu ersetzen – ändern geht in „Blöcke“.";
+  const FORMULA_HINT = tr("Eine Formel aus der Blöcke-Ansicht. Antippen, um sie zu ersetzen – ändern geht in „Blöcke“.");
 
   function varSelect(s) {
     const names = varsInView();
     const opts = names.includes(s.var) || !s.var ? names : [...names, s.var];
     return el("select", {
-      class: "f-in", "aria-label": "Variable",
+      class: "f-in", "aria-label": tr("Variable"),
       onchange: e => {
         if (e.target.value === "\u0000new") {
           const name = newVariable();
@@ -484,52 +483,51 @@ window.Flow = (() => {
       },
     }, !s.var ? el("option", { value: "", selected: true }, "–") : null,
        opts.map(n => el("option", { value: n, selected: n === s.var }, n)),
-       el("option", { value: "\u0000new" }, "＋ neu …"));
+       el("option", { value: "\u0000new" }, tr("＋ neu …")));
   }
 
   // the pitch: a note from the menu (or, via ▾, a variable, a sensor …)
   function noteControl(s) {
-    if (s.hz.k !== "num") return valueControl(s, "hz", "Ton");
+    if (s.hz.k !== "num") return valueControl(s, "hz", tr("Ton"));
     const hz = s.hz.n;
     const notes = typeof NOTES !== "undefined" ? NOTES.map(n => [String(n.hz), n.name]) : [];
     const label = typeof noteLabel === "function" ? noteLabel : x => `${x} Hz`;
     const opts = notes.some(([v]) => Number(v) === hz) ? notes : [...notes, [String(hz), label(hz)]];
     return slot(el("span", { class: "f-val" },
-      el("select", { class: "f-in", "aria-label": "Ton", onchange: e => { s.hz = num(Number(e.target.value)); changed({ layout: false }); } },
+      el("select", { class: "f-in", "aria-label": tr("Ton"), onchange: e => { s.hz = num(Number(e.target.value)); changed({ layout: false }); } },
         opts.map(([v, t]) => el("option", { value: v, selected: Number(v) === hz }, t))),
-      el("button", { type: "button", class: "f-more", "aria-label": "Ton: Variable, Sensor oder Zufall",
+      el("button", { type: "button", class: "f-more", "aria-label": tr("{what}: Variable, Sensor oder Zufall", { what: tr("Ton") }),
                      onclick: e => openValuePop(e.currentTarget, s, "hz") }, "▾")), s, "hz");
   }
 
 
   function condText(c) {
-    if (c.k === "line") {
-      const where = { left: "Linie links", right: "Linie rechts", both: "Linie unter beiden" }[c.side];
-      return `${where} ${c.black ? "schwarz" : "weiß"}?`;
-    }
-    if (c.k === "button") return c.pressed ? "Taste gedrückt?" : "Taste nicht gedrückt?";
+    if (c.k === "line") return LINE_TEXT[c.side][c.black ? 0 : 1];
+    if (c.k === "button") return c.pressed ? tr("Taste gedrückt?") : tr("Taste nicht gedrückt?");
     if (c.k === "expr") return `${exprText(c.e)}?`;
     return `${valueText(c.a)} ${CMP[c.fn]} ${valueText(c.v)}${c.v.k === "num" ? unitOf(c.a) : ""}?`;
   }
-  const unitOf = v => (v.k === "sensor" ? { distance: " cm", timer: " Sek." }[v.name] || "" : "");
+  const LINE_TEXT = { left: [tr("Linie links schwarz?"), tr("Linie links weiß?")], right: [tr("Linie rechts schwarz?"), tr("Linie rechts weiß?")],
+                      both: [tr("Linie unter beiden schwarz?"), tr("Linie unter beiden weiß?")] };
+  const unitOf = v => (v.k === "sensor" ? { distance: " cm", timer: ` ${tr("Sek.")}` }[v.name] || "" : "");
 
   // a question: a comparison shows both sides as value slots; anything else is a chip from the menu (and a value
   // dropped on it turns it into a comparison)
   function condControl(s) {
     const c = s.cond;
-    const more = el("button", { type: "button", class: "f-more f-cond-more", "aria-label": "Andere Frage wählen",
-                                title: "Andere Frage wählen (Linie, Taste, …)", onclick: e => openCondPop(e.currentTarget, s) }, "▾");
+    const more = el("button", { type: "button", class: "f-more f-cond-more", "aria-label": tr("Andere Frage wählen"),
+                                title: tr("Andere Frage wählen (Linie, Taste, …)"), onclick: e => openCondPop(e.currentTarget, s) }, "▾");
     if (c.k !== "cmp") {
       const chip = el("button", { type: "button", class: `f-chip f-cond${c.k === "expr" ? " f-formula" : ""}`,
-                                  "aria-label": "Frage ändern", title: c.k === "expr" ? FORMULA_HINT : null,
+                                  "aria-label": tr("Frage ändern"), title: c.k === "expr" ? FORMULA_HINT : null,
                                   onclick: e => openCondPop(e.currentTarget, s) }, condText(c));
       slot(chip, s, "cond", true);
       return chip;
     }
-    const fn = el("select", { class: "f-in f-op", "aria-label": "Vergleich", onchange: e => { c.fn = e.target.value; changed({ layout: false }); } },
+    const fn = el("select", { class: "f-in f-op", "aria-label": tr("Vergleich"), onchange: e => { c.fn = e.target.value; changed({ layout: false }); } },
       Object.entries(CMP).map(([v, label]) => el("option", { value: v, selected: v === c.fn }, label)));
     const unit = c.v.k === "num" ? unitOf(c.a).trim() : "";
-    return el("span", { class: "f-cmp" }, valueControl(c, "a", "linke Seite"), fn, valueControl(c, "v", "rechte Seite"),
+    return el("span", { class: "f-cmp" }, valueControl(c, "a", tr("linke Seite")), fn, valueControl(c, "v", tr("rechte Seite")),
       unit ? el("span", { class: "f-t" }, unit) : null, el("span", { class: "f-t" }, "?"), more);
   }
 
@@ -537,30 +535,30 @@ window.Flow = (() => {
   function content(s) {
     const t = text => el("span", { class: "f-t" }, text);
     switch (s.do) {
-      case "move": return [t("fahre"), choice(s, "dir", [["forward", "vorwärts"], ["backward", "rückwärts"]], "Richtung"),
-        numberInput(s, "steps", { min: 0.1, max: 50, aria: "Schritte", layout: true }), t(s.steps === 1 ? "Schritt" : "Schritte")];
-      case "turn": return [t("drehe"), choice(s, "dir", [["left", "links"], ["right", "rechts"]], "Richtung"),
-        numberInput(s, "deg", { min: 5, max: 720, aria: "Winkel" }), t("°")];
-      case "drive": return [t("fahre los"), choice(s, "dir", [["forward", "vorwärts"], ["backward", "rückwärts"],
-        ["left", "links herum"], ["right", "rechts herum"]], "Richtung"), t("mit"), valueControl(s, "power", "Tempo", 0, 100), t("%")];
-      case "motors": return [t("Motor links"), valueControl(s, "left", "linker Motor", -100, 100), t("% rechts"),
-        valueControl(s, "right", "rechter Motor", -100, 100), t("%")];
-      case "stop": return [t("halte an")];
-      case "beep": return [t(s.wait ? "spiele Ton" : "starte Ton"), noteControl(s), t("für"),
-        valueControl(s, "sec", "Dauer", 0.05, 30), t("Sek.")];
-      case "reset_timer": return [t("⏱ Stoppuhr auf 0")];
-      case "wait": return [t("warte"), valueControl(s, "sec", "Sekunden", 0, 3600), t("Sek.")];
+      case "move": return [t(tr("fahre")), choice(s, "dir", [["forward", tr("vorwärts")], ["backward", tr("rückwärts")]], tr("Richtung")),
+        numberInput(s, "steps", { min: 0.1, max: 50, aria: tr("Schritte"), layout: true }), t(s.steps === 1 ? tr("Schritt") : tr("Schritte"))];
+      case "turn": return [t(tr("drehe")), choice(s, "dir", [["left", tr("links")], ["right", tr("rechts")]], tr("Richtung")),
+        numberInput(s, "deg", { min: 5, max: 720, aria: tr("Winkel") }), t("°")];
+      case "drive": return [t(tr("fahre los")), choice(s, "dir", [["forward", tr("vorwärts")], ["backward", tr("rückwärts")],
+        ["left", tr("links herum")], ["right", tr("rechts herum")]], tr("Richtung")), t(tr("mit")), valueControl(s, "power", tr("Tempo"), 0, 100), t("%")];
+      case "motors": return [t(tr("Motor links")), valueControl(s, "left", tr("linker Motor"), -100, 100), t(tr("% rechts")),
+        valueControl(s, "right", tr("rechter Motor"), -100, 100), t("%")];
+      case "stop": return [t(tr("halte an"))];
+      case "beep": return [t(s.wait ? tr("spiele Ton") : tr("starte Ton")), noteControl(s), t(tr("für")),
+        valueControl(s, "sec", tr("Dauer"), 0.05, 30), t(tr("Sek."))];
+      case "reset_timer": return [t(tr("⏱ Stoppuhr auf 0"))];
+      case "wait": return [t(tr("warte")), valueControl(s, "sec", tr("Sekunden"), 0, 3600), t(tr("Sek."))];
       case "if": return [condControl(s)];
-      case "repeat": return [t("↻ wiederhole"), valueControl(s, "times", "wie oft", 0, 10000), t("mal")];
-      case "forever": return [t("↻ wiederhole fortlaufend")];
-      case "repeat_until": return [t("↻ wiederhole bis"), condControl(s)];
-      case "wait_until": return [t("warte bis"), condControl(s)];
-      case "end": return [t("■ Programm beenden")];
-      case "set": return [t("setze"), varSelect(s), t("auf"), valueControl(s, "value", "Wert")];
-      case "change": return [t("ändere"), varSelect(s), t("um"), valueControl(s, "by", "um wie viel")];
+      case "repeat": return [t(tr("↻ wiederhole")), valueControl(s, "times", tr("wie oft"), 0, 10000), t(tr("mal"))];
+      case "forever": return [t(tr("↻ wiederhole fortlaufend"))];
+      case "repeat_until": return [t(tr("↻ wiederhole bis")), condControl(s)];
+      case "wait_until": return [t(tr("warte bis")), condControl(s)];
+      case "end": return [t(tr("■ Programm beenden"))];
+      case "set": return [t(tr("setze")), varSelect(s), t(tr("auf")), valueControl(s, "value", tr("Wert"))];
+      case "change": return [t(tr("ändere")), varSelect(s), t(tr("um")), valueControl(s, "by", tr("um wie viel"))];
       case "call": {
         const f = doc.functions[s.name];
-        return [t(`🧩 ${s.name}`), ...(f ? f.params.flatMap((p, i) => [t(`${p}:`), valueControl(s.args, i, p)]) : [t("(gibt es nicht mehr)")])];
+        return [t(`🧩 ${s.name}`), ...(f ? f.params.flatMap((p, i) => [t(`${p}:`), valueControl(s.args, i, p)]) : [t(tr("(gibt es nicht mehr)"))])];
       }
       default: return [t(s.do)];
     }
@@ -602,22 +600,22 @@ window.Flow = (() => {
 
   function openValuePop(anchor, obj, key) {
     const v = obj[key];
-    const n = popNum(v.k === "num" ? v.n : 0, "Zahl");
+    const n = popNum(v.k === "num" ? v.n : 0, tr("Zahl"));
     const okN = popBtn("✓", () => { obj[key] = num(readNum(n, 0)); }, "ok");
     okOnEnter([n], okN);
-    const lo = popNum(v.k === "random" ? v.lo : 1, "von"), hi = popNum(v.k === "random" ? v.hi : 10, "bis");
+    const lo = popNum(v.k === "random" ? v.lo : 1, tr("von")), hi = popNum(v.k === "random" ? v.hi : 10, tr("bis"));
     const okR = popBtn("✓", () => { obj[key] = { k: "random", lo: Math.round(readNum(lo, 1)), hi: Math.round(readNum(hi, 10)) }; }, "ok");
     okOnEnter([lo, hi], okR);
     const vars = varsInView();
-    openPop(anchor, "Was soll hier stehen?",
-      v.k === "expr" ? el("p", { class: "f-pop-now" }, `Jetzt: ${valueText(v)} (Formel aus „Blöcke“)`) : null,
-      popRow(el("span", { class: "f-pop-label" }, "Zahl"), n, okN),
-      popRow(el("span", { class: "f-pop-label" }, "Variable"),
+    openPop(anchor, tr("Was soll hier stehen?"),
+      v.k === "expr" ? el("p", { class: "f-pop-now" }, tr("Jetzt: {now} (Formel aus „Blöcke“)", { now: valueText(v) })) : null,
+      popRow(el("span", { class: "f-pop-label" }, tr("Zahl")), n, okN),
+      popRow(el("span", { class: "f-pop-label" }, tr("Variable")),
         ...vars.map(name => popBtn(name, () => { obj[key] = { k: "var", name }; }, "var")),
-        popBtn("＋ neu", () => { const name = newVariable(); if (name) obj[key] = { k: "var", name }; }, "ghost")),
-      popRow(el("span", { class: "f-pop-label" }, "Sensor"),
+        popBtn(tr("＋ neu"), () => { const name = newVariable(); if (name) obj[key] = { k: "var", name }; }, "ghost")),
+      popRow(el("span", { class: "f-pop-label" }, tr("Sensor")),
         ...Object.entries(SENSOR_VALUES).map(([name, label]) => popBtn(label, () => { obj[key] = { k: "sensor", name }; }, "sensor"))),
-      popRow(el("span", { class: "f-pop-label" }, "🎲 Zufall"), lo, el("span", {}, "bis"), hi, okR));
+      popRow(el("span", { class: "f-pop-label" }, tr("🎲 Zufall")), lo, el("span", {}, tr("bis")), hi, okR));
   }
 
   function openCondPop(anchor, s) {
@@ -626,10 +624,10 @@ window.Flow = (() => {
     const line = (side, black, label) => popBtn(label, set({ k: "line", side, black }), `line ${c.k === "line" && c.side === side && c.black === black ? "on" : ""}`);
     const cmpRow = (a, label, unit, fns, def) => {
       const same = c.k === "cmp" && (a === "var" ? c.a.k === "var" : c.a.k === "sensor" && c.a.name === a);
-      const fn = el("select", { class: "f-in", "aria-label": "Vergleich" },
+      const fn = el("select", { class: "f-in", "aria-label": tr("Vergleich") },
         fns.map(f => el("option", { value: f, selected: same ? c.fn === f : f === fns[0] }, CMP[f])));
       const value = popNum(same && c.v.k === "num" ? c.v.n : def, label);
-      const varPick = a === "var" ? el("select", { class: "f-in", "aria-label": "Variable" },
+      const varPick = a === "var" ? el("select", { class: "f-in", "aria-label": tr("Variable") },
         varsInView().map(n => el("option", { value: n, selected: same && c.a.name === n }, n))) : null;
       const ok = popBtn("✓", () => {
         s.cond = { k: "cmp", a: varPick ? { k: "var", name: varPick.value } : { k: "sensor", name: a }, fn: fn.value, v: num(readNum(value, def)) };
@@ -637,17 +635,17 @@ window.Flow = (() => {
       okOnEnter([value], ok);
       return popRow(el("span", { class: "f-pop-label" }, label), varPick, fn, value, unit ? el("span", {}, unit) : null, ok);
     };
-    openPop(anchor, "Was soll der Roboter prüfen?",
-      c.k === "expr" ? el("p", { class: "f-pop-now" }, `Jetzt: ${condText(c)} (Formel aus „Blöcke“)`) : null,
-      popRow(el("span", { class: "f-pop-label" }, "Linie"),
-        line("left", true, "links schwarz"), line("right", true, "rechts schwarz"), line("both", true, "beide schwarz"),
-        line("left", false, "links weiß"), line("right", false, "rechts weiß"), line("both", false, "beide weiß")),
-      popRow(el("span", { class: "f-pop-label" }, "Taste"),
-        popBtn("gedrückt", set({ k: "button", pressed: true })), popBtn("nicht gedrückt", set({ k: "button", pressed: false }))),
-      cmpRow("distance", "📏 Abstand", "cm", ["<", ">"], 10),
-      cmpRow("light", "💡 Helligkeit", "", ["<", ">"], 500),
-      cmpRow("timer", "⏱ Stoppuhr", "Sek.", [">", "<"], 5),
-      varsInView().length ? cmpRow("var", "Variable", "", ["=", "<", ">", "!=", "<=", ">="], 0) : null);
+    openPop(anchor, tr("Was soll der Roboter prüfen?"),
+      c.k === "expr" ? el("p", { class: "f-pop-now" }, tr("Jetzt: {now} (Formel aus „Blöcke“)", { now: condText(c) })) : null,
+      popRow(el("span", { class: "f-pop-label" }, tr("Linie")),
+        line("left", true, tr("links schwarz")), line("right", true, tr("rechts schwarz")), line("both", true, tr("beide schwarz")),
+        line("left", false, tr("links weiß")), line("right", false, tr("rechts weiß")), line("both", false, tr("beide weiß"))),
+      popRow(el("span", { class: "f-pop-label" }, tr("Taste")),
+        popBtn(tr("gedrückt"), set({ k: "button", pressed: true })), popBtn(tr("nicht gedrückt"), set({ k: "button", pressed: false }))),
+      cmpRow("distance", tr("📏 Abstand"), "cm", ["<", ">"], 10),
+      cmpRow("light", tr("💡 Helligkeit"), "", ["<", ">"], 500),
+      cmpRow("timer", tr("⏱ Stoppuhr"), tr("Sek."), [">", "<"], 5),
+      varsInView().length ? cmpRow("var", tr("Variable"), "", ["=", "<", ">", "!=", "<=", ">="], 0) : null);
   }
 
   // --- names: variables, "Meine Blöcke", their inputs ------------------------------------------------
@@ -659,7 +657,7 @@ window.Flow = (() => {
       if (raw === null) return null;
       const name = cleanName(raw);
       if (!name) return null;
-      const problem = name.length > MAX_NAME ? `Höchstens ${MAX_NAME} Zeichen.` : taken(name);
+      const problem = name.length > MAX_NAME ? tr("Höchstens {n} Zeichen.", { n: MAX_NAME }) : taken(name);
       if (!problem) return name;
       alert(problem);
       value = name;
@@ -668,8 +666,8 @@ window.Flow = (() => {
   const same = (a, b) => a.toLowerCase() === b.toLowerCase();
 
   function newVariable() {
-    const name = askName("Wie soll die neue Variable heißen?", "", n =>
-      varsInView().some(v => same(v, n)) ? `„${n}“ gibt es schon.` : null);
+    const name = askName(tr("Wie soll die neue Variable heißen?"), "", n =>
+      varsInView().some(v => same(v, n)) ? tr("„{name}“ gibt es schon.", { name: n }) : null);
     if (name) { doc.vars.push(name); renderPalette(); }
     return name;
   }
@@ -677,8 +675,8 @@ window.Flow = (() => {
   function callsTo(name, fn) { walkAll(s => { if (s.do === "call" && s.name === name) fn(s); }); }
 
   function newFunction() {
-    const name = askName("Wie soll dein neuer Block heißen?", "", n =>
-      Object.keys(doc.functions).some(f => same(f, n)) ? `Einen Block „${n}“ gibt es schon.` : null);
+    const name = askName(tr("Wie soll dein neuer Block heißen?"), "", n =>
+      Object.keys(doc.functions).some(f => same(f, n)) ? tr("Einen Block „{name}“ gibt es schon.", { name: n }) : null);
     if (!name) return;
     doc.functions[name] = { id: newId(), params: [], body: [] };
     show(name);
@@ -686,8 +684,8 @@ window.Flow = (() => {
   }
 
   function renameFunction(old) {
-    const name = askName("Neuer Name für den Block:", old, n =>
-      Object.keys(doc.functions).some(f => same(f, n) && f !== old) ? `Einen Block „${n}“ gibt es schon.` : null);
+    const name = askName(tr("Neuer Name für den Block:"), old, n =>
+      Object.keys(doc.functions).some(f => same(f, n) && f !== old) ? tr("Einen Block „{name}“ gibt es schon.", { name: n }) : null);
     if (!name || name === old) return;
     doc.functions = Object.fromEntries(Object.entries(doc.functions).map(([k, f]) => [k === old ? name : k, f]));
     callsTo(old, s => { s.name = name; });
@@ -698,17 +696,17 @@ window.Flow = (() => {
   function deleteFunction(name) {
     let used = false;
     callsTo(name, () => { used = true; });
-    if (used) { notify(`„${name}“ wird noch benutzt. Nimm es zuerst überall heraus.`); return; }
+    if (used) { notify(tr("„{name}“ wird noch benutzt. Nimm es zuerst überall heraus.", { name })); return; }
     delete doc.functions[name];
     show(null);
     changed();
-    toast(`Block „${name}“ gelöscht.`);
+    toast(tr("Block „{name}“ gelöscht.", { name }));
   }
 
   function addParam(name) {
     const f = doc.functions[name];
-    const p = askName("Wie soll die Eingabe heißen? (z. B. „Strecke“)", "", n =>
-      f.params.some(q => same(q, n)) ? `„${n}“ gibt es schon.` : null);
+    const p = askName(tr("Wie soll die Eingabe heißen? (z. B. „Strecke“)"), "", n =>
+      f.params.some(q => same(q, n)) ? tr("„{name}“ gibt es schon.", { name: n }) : null);
     if (!p) return;
     f.params.push(p);
     callsTo(name, s => s.args.push(num(0)));
@@ -720,7 +718,7 @@ window.Flow = (() => {
     const [gone] = f.params.splice(i, 1);
     callsTo(name, s => s.args.splice(i, 1));
     changed();
-    toast(`Eingabe „${gone}“ entfernt.`);
+    toast(tr("Eingabe „{name}“ entfernt.", { name: gone }));
   }
 
   // --- editing -----------------------------------------------------------------------------------------
@@ -742,8 +740,8 @@ window.Flow = (() => {
   // nothing can come after "wiederhole fortlaufend" or "beende Programm"
   function terminalProblem(s, arr, index) {
     if (!TERMINAL.has(s.do) || index === arr.length) return null;
-    return s.do === "forever" ? "„wiederhole fortlaufend“ hört nie auf – danach kann nichts mehr kommen. Setz es ans Ende."
-                              : "Nach „beende Programm“ kommt nichts mehr – setz es ans Ende.";
+    return s.do === "forever" ? tr("„wiederhole fortlaufend“ hört nie auf – danach kann nichts mehr kommen. Setz es ans Ende.")
+                              : tr("Nach „beende Programm“ kommt nichts mehr – setz es ans Ende.");
   }
 
   function insert(s, arr, index) {
@@ -772,7 +770,7 @@ window.Flow = (() => {
     hit.arr.splice(hit.index, 1);
     if (selected === id) selected = null;
     changed();
-    toast(filled(hit.s) ? "Gelöscht – mit allem, was darin war." : "Gelöscht.");     // no "are you sure?": ↶ brings it back
+    toast(filled(hit.s) ? tr("Gelöscht – mit allem, was darin war.") : tr("Gelöscht."));     // no "are you sure?": ↶ brings it back
   }
 
   function cloneStmt(s) {
@@ -786,7 +784,7 @@ window.Flow = (() => {
     const hit = find(id);
     if (!hit) return;
     const copy = cloneStmt(hit.s);
-    if (terminalProblem(copy, hit.arr, hit.index + 1)) { notify("Das geht hier nicht – danach kann nichts mehr kommen."); return; }
+    if (terminalProblem(copy, hit.arr, hit.index + 1)) { notify(tr("Das geht hier nicht – danach kann nichts mehr kommen.")); return; }
     hit.arr.splice(hit.index + 1, 0, copy);
     selected = copy.id;
     changed();
@@ -850,7 +848,7 @@ window.Flow = (() => {
   function toast(msg, withUndo = true) {
     if (!ui) return;
     ui.toast.replaceChildren(el("span", {}, msg),
-      withUndo ? el("button", { type: "button", class: "f-tool", onclick: undo }, "↶ Rückgängig") : null);
+      withUndo ? el("button", { type: "button", class: "f-tool", onclick: undo }, tr("↶ Rückgängig")) : null);
     ui.toast.hidden = false;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(hideToast, 6000);
@@ -924,7 +922,7 @@ window.Flow = (() => {
       layer.append(p);
     };
     const plus = (x, y, arr, index) => {
-      const btn = el("button", { type: "button", class: "f-plus", "aria-label": "Hier einfügen", title: "Hier einfügen: tippe danach auf einen Baustein" }, "+");
+      const btn = el("button", { type: "button", class: "f-plus", "aria-label": tr("Hier einfügen"), title: tr("Hier einfügen: tippe danach auf einen Baustein") }, "+");
       pos(btn, x, y);
       btn.addEventListener("click", () => { if (dragJustEnded()) return; cursor = { arr, index }; markCursor(); });
       layer.append(btn);
@@ -984,8 +982,8 @@ window.Flow = (() => {
           place(x, y) {
             region(x - l, y - PAD, l + r, height + PAD + (open ? 8 : PAD), s.id);
             box(x, y);
-            port(x - tag, y + my, "ja", "yes", s.id);
-            port(x + tag, y + my, "nein", "no", s.id);
+            port(x - tag, y + my, tr("ja"), "yes", s.id);
+            port(x + tag, y + my, tr("nein"), "no", s.id);
             line([[x - tip, y + my], [x + cxL, y + my], [x + cxL, y + h]], { cls: "yes" });
             line([[x + tip, y + my], [x + cxR, y + my], [x + cxR, y + h]], { cls: "no" });
             ja.place(x + cxL, y + h);
@@ -1010,10 +1008,10 @@ window.Flow = (() => {
             body.place(x, y + h);
             if (body.open) line([[x, y + bodyEnd], [x, y + back], [x - left, y + back], [x - left, y + my], [x - hw, y + my]], { arrow: true, cls: "loop" });
             if (!forever) {
-              port(x + tag, y + my, until ? "ja" : "fertig", "yes", s.id);
+              port(x + tag, y + my, until ? tr("ja") : tr("fertig"), "yes", s.id);
               line([[x + tip, y + my], [x + right, y + my], [x + right, y + height], [x, y + height]], { cls: until ? "yes" : "" });
             }
-            if (until) port(x + 20 + PORT_W / 2, y + h + 4 + PORT_H / 2, "nein", "no", s.id);
+            if (until) port(x + 20 + PORT_W / 2, y + h + 4 + PORT_H / 2, tr("nein"), "no", s.id);
           },
         };
       }
@@ -1024,9 +1022,9 @@ window.Flow = (() => {
           l: out + PAD, r: Math.max(hw, 20 + PORT_W) + PAD, h, open: true,
           place(x, y) {
             box(x, y);
-            port(x - tag, y + my, "nein", "no", s.id);
+            port(x - tag, y + my, tr("nein"), "no", s.id);
             line([[x - tip, y + my], [x - out, y + my], [x - out, y - 16], [x - hw / 2, y - 16], [x - hw / 2, y]], { arrow: true, cls: "no" });
-            port(x + 20 + PORT_W / 2, y + h + 4 + PORT_H / 2, "ja", "yes", s.id);
+            port(x + 20 + PORT_W / 2, y + h + 4 + PORT_H / 2, tr("ja"), "yes", s.id);
           },
         };
       }
@@ -1122,20 +1120,20 @@ window.Flow = (() => {
   }
 
   function startEl() {
-    if (view === null) return el("div", { class: "f-node f-pill f-start" }, el("span", { class: "f-t" }, "▶ Start"));
+    if (view === null) return el("div", { class: "f-node f-pill f-start" }, el("span", { class: "f-t" }, tr("▶ Start")));
     const f = doc.functions[view], name = view;
     return el("div", { class: "f-node f-pill f-start f-fn", style: `--c: ${COLORS.mine}` },
       el("span", { class: "f-t" }, `🧩 ${name}`),
-      f.params.length ? el("span", { class: "f-t f-small" }, "mit") : null,
+      f.params.length ? el("span", { class: "f-t f-small" }, tr("mit")) : null,
       f.params.map((p, i) => el("span", { class: "f-param" }, p,
-        el("button", { type: "button", class: "f-x", "aria-label": `Eingabe „${p}“ entfernen`, onclick: () => removeParam(name, i) }, "✕"))),
-      el("button", { type: "button", class: "f-tool", title: "Eingabe hinzufügen (z. B. eine Strecke)", onclick: () => addParam(name) }, "＋ Eingabe"),
-      el("button", { type: "button", class: "f-tool", title: "Umbenennen", "aria-label": "Block umbenennen", onclick: () => renameFunction(name) }, "✎"),
-      el("button", { type: "button", class: "f-tool", title: "Block löschen", "aria-label": "Block löschen", onclick: () => deleteFunction(name) }, "🗑"));
+        el("button", { type: "button", class: "f-x", "aria-label": tr("Eingabe „{name}“ entfernen", { name: p }), onclick: () => removeParam(name, i) }, "✕"))),
+      el("button", { type: "button", class: "f-tool", title: tr("Eingabe hinzufügen (z. B. eine Strecke)"), onclick: () => addParam(name) }, tr("＋ Eingabe")),
+      el("button", { type: "button", class: "f-tool", title: tr("Umbenennen"), "aria-label": tr("Block umbenennen"), onclick: () => renameFunction(name) }, "✎"),
+      el("button", { type: "button", class: "f-tool", title: tr("Block löschen"), "aria-label": tr("Block löschen"), onclick: () => deleteFunction(name) }, "🗑"));
   }
 
   function endEl() {
-    return el("div", { class: "f-node f-pill f-end" }, el("span", { class: "f-t" }, view === null ? "🏁 Ziel" : "↩ zurück"));
+    return el("div", { class: "f-node f-pill f-end" }, el("span", { class: "f-t" }, view === null ? tr("🏁 Ziel") : tr("↩ zurück")));
   }
 
   // --- states drawn on top of a render: cursor, selection, running box, error ---------------------------
@@ -1152,8 +1150,8 @@ window.Flow = (() => {
     if (!e) { selected = null; return; }
     e.classList.add("selected");
     const tools = el("div", { class: "f-tools" },
-      el("button", { type: "button", class: "f-tool", title: "Kopie dahinter einfügen", onclick: () => duplicate(selected) }, "⧉ Kopie"),
-      el("button", { type: "button", class: "f-tool del", title: "Löschen (Entf)", onclick: () => remove(selected) }, "✕ Löschen"));
+      el("button", { type: "button", class: "f-tool", title: tr("Kopie dahinter einfügen"), onclick: () => duplicate(selected) }, tr("⧉ Kopie")),
+      el("button", { type: "button", class: "f-tool del", title: tr("Löschen (Entf)"), onclick: () => remove(selected) }, tr("✕ Löschen")));
     tools.style.left = `${e.offsetLeft + e.offsetWidth + 8}px`;
     tools.style.top = `${e.offsetTop}px`;
     ui.layer.append(tools);
@@ -1193,15 +1191,15 @@ window.Flow = (() => {
       type: "button", class: "f-tab", "data-view": name ?? "", "aria-pressed": String(view === name),
       onclick: () => show(name),
     }, label);
-    ui.tabs.replaceChildren(tab(null, "▶ Hauptprogramm"),
+    ui.tabs.replaceChildren(tab(null, tr("▶ Hauptprogramm")),
       ...Object.keys(doc.functions).map(name => tab(name, `🧩 ${name}`)),
-      el("button", { type: "button", class: "f-tab f-new", title: "Einen eigenen Block bauen", onclick: newFunction }, "＋ Neuer Block"),
-      el("button", { type: "button", class: "f-tab f-undo", title: "Rückgängig (Strg+Z)", disabled: !history.length, onclick: undo }, "↶ Rückgängig"));
+      el("button", { type: "button", class: "f-tab f-new", title: tr("Einen eigenen Block bauen"), onclick: newFunction }, tr("＋ Neuer Block")),
+      el("button", { type: "button", class: "f-tab f-undo", title: tr("Rückgängig (Strg+Z)"), disabled: !history.length, onclick: undo }, tr("↶ Rückgängig")));
   }
 
   function renderPalette() {
     const item = (label, cat, make, needsVar) => {
-      const b = el("button", { type: "button", class: "f-pal-item", style: `--c: ${COLORS[cat]}`, title: "Antippen: am ausgewählten ＋ einfügen. Oder auf einen Pfeil ziehen." }, label);
+      const b = el("button", { type: "button", class: "f-pal-item", style: `--c: ${COLORS[cat]}`, title: tr("Antippen: am ausgewählten ＋ einfügen. Oder auf einen Pfeil ziehen.") }, label);
       b.addEventListener("click", () => { if (!dragJustEnded()) addFromPalette(make, needsVar); });
       b.addEventListener("pointerdown", e => pressDraggable(e, { kind: "new", make, needsVar, label: b, cat }));
       return b;
@@ -1209,8 +1207,8 @@ window.Flow = (() => {
     // a value block: dragged into a slot (tapping only explains)
     const value = (label, cat, make) => {
       const b = el("button", { type: "button", class: "f-pal-item f-pal-value", style: `--c: ${COLORS[cat]}`,
-                               title: "Zieh den Wert in ein Feld oder auf eine Frage ⬡." }, label);
-      b.addEventListener("click", () => { if (!dragJustEnded()) toast("Zieh den Wert in ein Feld oder auf eine Frage ⬡.", false); });
+                               title: tr("Zieh den Wert in ein Feld oder auf eine Frage ⬡.") }, label);
+      b.addEventListener("click", () => { if (!dragJustEnded()) toast(tr("Zieh den Wert in ein Feld oder auf eine Frage ⬡."), false); });
       b.addEventListener("pointerdown", e => pressDraggable(e, { kind: "value", make, label: b }));
       return b;
     };
@@ -1222,10 +1220,10 @@ window.Flow = (() => {
       ...PALETTE.map(sec => section(sec.name, sec.cat, sec.hint ? el("p", { class: "f-pal-hint" }, sec.hint) : null,
         values(sec).length ? el("div", { class: "f-pal-values" }, values(sec).map(([label, make]) => value(label, sec.cat, make))) : null,
         sec.items.map(([label, make, needs]) => item(label, sec.cat, make, needs === "var")),
-        sec.cat === "vars" ? el("button", { type: "button", class: "f-pal-add", onclick: () => newVariable() }, "＋ Neue Variable") : null)),
-      section("Meine Blöcke", "mine",
+        sec.cat === "vars" ? el("button", { type: "button", class: "f-pal-add", onclick: () => newVariable() }, tr("＋ Neue Variable")) : null)),
+      section(tr("Meine Blöcke"), "mine",
         fns.map(([name, f]) => item(`🧩 ${name}`, "mine", () => ({ do: "call", name, args: f.params.map(() => num(0)) }))),
-        el("button", { type: "button", class: "f-pal-add", onclick: newFunction }, "＋ Neuer Block")));
+        el("button", { type: "button", class: "f-pal-add", onclick: newFunction }, tr("＋ Neuer Block"))));
   }
 
   // --- dragging (pointer events, so it works with fingers too) ---------------------------------------------
@@ -1450,16 +1448,16 @@ window.Flow = (() => {
     if (ui) return;
     const zoomLabel = el("span", { class: "f-zoom-label" }, "100 %");
     const zoom = el("div", { class: "f-zoom" },
-      el("button", { type: "button", "aria-label": "kleiner", onclick: () => setScale(scale / ZOOM.step) }, "−"), zoomLabel,
-      el("button", { type: "button", "aria-label": "größer", onclick: () => setScale(scale * ZOOM.step) }, "+"));
+      el("button", { type: "button", "aria-label": tr("kleiner"), onclick: () => setScale(scale / ZOOM.step) }, "−"), zoomLabel,
+      el("button", { type: "button", "aria-label": tr("größer"), onclick: () => setScale(scale * ZOOM.step) }, "+"));
     const svg = document.createElementNS(SVG_NS, "svg");
     svg.setAttribute("class", "f-svg");
     const layer = el("div", { class: "f-layer" });
     const stage = el("div", { class: "f-stage" }, svg, layer);
     const sizer = el("div", { class: "f-sizer" }, stage);
     const scroller = el("div", { class: "f-scroller" }, sizer);
-    const palette = el("div", { class: "f-palette", "aria-label": "Bausteine" });
-    const tabs = el("div", { class: "f-tabs", role: "group", "aria-label": "Programm oder eigener Block" });
+    const palette = el("div", { class: "f-palette", "aria-label": tr("Bausteine") });
+    const tabs = el("div", { class: "f-tabs", role: "group", "aria-label": tr("Programm oder eigener Block") });
     const note = el("div", { class: "f-toast", role: "status", hidden: true });
     root.replaceChildren(el("div", { class: "f-main" }, palette, el("div", { class: "f-canvas" }, tabs, el("div", { class: "f-view" }, scroller, zoom, note))));
     ui = { root, svg, layer, stage, sizer, scroller, palette, tabs, zoomLabel, toast: note };

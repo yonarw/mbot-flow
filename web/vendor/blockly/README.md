@@ -2,7 +2,7 @@
 
 Unmodified files from the npm package `blockly@12.5.1`
 (tarball integrity `sha512-etXLpUtEkcRibHGwIJ4BsvnIzMJJs0C0yPIjE/W0NCtj8ACha/a7Q9n7Ib6+j7N4EzQ0p28YPZMnypi5pNIj1g==`):
-`blockly_compressed.js`, `blocks_compressed.js`, `msg/de.js`, `media/`.
+`blockly_compressed.js`, `blocks_compressed.js`, `msg/de.js`, `msg/en.js`, `media/`.
 
 Copyright Google LLC, licensed under the Apache License 2.0 (<https://www.apache.org/licenses/LICENSE-2.0>).
 Source: <https://github.com/google/blockly>.

@@ -6,7 +6,7 @@ if fuser -s "$PORT/tcp" 2>/dev/null; then
   fuser -k -TERM "$PORT/tcp" >/dev/null 2>&1
   sleep 1
   fuser -s "$PORT/tcp" 2>/dev/null && fuser -k -KILL "$PORT/tcp" >/dev/null 2>&1
-  echo "Server auf Port $PORT gestoppt."
+  echo "Stopped the server on port $PORT."
 else
-  echo "Kein Server auf Port $PORT gefunden."
+  echo "No server found on port $PORT."
 fi

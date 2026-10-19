@@ -30,6 +30,7 @@ from pathlib import Path
 
 from bytecode import FAULTS, MODES, PROG_MAX, VERSION, crc16
 from compiler import LINE_LEFT, CompileError, compile_program, listing, owner_at
+from i18n import Msg, lang_of, tr
 
 HERE = Path(__file__).resolve().parent
 WEB = HERE.parent / "web"
@@ -85,10 +86,12 @@ DEFAULT_SYMBOL = "⭐"
 
 
 class UserError(Exception):
-    """Something the GUI should show to the user as a message; .block: the block it is about, if known."""
+    """Something the GUI should show to the user as a message (.msg, a Msg: German as str(), any language via
+    .msg.render(lang)); .block: the block it is about, if known."""
 
-    def __init__(self, message, block=None):
-        super().__init__(message)
+    def __init__(self, message, block=None, **args):
+        self.msg = message if isinstance(message, Msg) else Msg(message, **args)
+        super().__init__(self.msg)
         self.block = block
 
 
@@ -110,7 +113,7 @@ def clean_cal(raw):
             try:
                 value = float(raw[key])
             except (TypeError, ValueError):
-                raise UserError(f"Ungültiger Wert für {key}")
+                raise UserError("Ungültiger Wert für {key}", key=key)
             lo, hi = CAL_LIMITS[key]
             cal[key] = round(max(lo, min(hi, value)), 2)
     return cal
@@ -150,12 +153,12 @@ class ProgramStore:
         if not isinstance(blocks, list) or not blocks:
             raise UserError("Das Programm ist leer.")
         if len(blocks) > MAX_BLOCKS:
-            raise UserError(f"Zu viele Bausteine (höchstens {MAX_BLOCKS}).")
+            raise UserError("Zu viele Bausteine (höchstens {n}).", n=MAX_BLOCKS)
         clean = []
         for b in blocks:
             kind = b.get("type") if isinstance(b, dict) else None
             if kind not in BLOCK_PARAMS:
-                raise UserError(f"Unbekannter Baustein: {kind}")
+                raise UserError("Unbekannter Baustein: {kind}", kind=kind)
             item = {"type": kind}
             if kind == "program":
                 name = " ".join(str(b.get("name") or "").split())
@@ -168,7 +171,7 @@ class ProgramStore:
                 except (KeyError, TypeError, ValueError):
                     value = float("nan")
                 if not math.isfinite(value):
-                    raise UserError(f"Ungültige Einstellung bei Baustein '{kind}'")
+                    raise UserError("Ungültige Einstellung bei Baustein „{kind}“", kind=kind)
                 item[key] = int(value) if value.is_integer() else value
             clean.append(item)
         return clean
@@ -179,7 +182,7 @@ class ProgramStore:
         if not name:
             raise UserError("Bitte gib dem Programm einen Namen.")
         if len(name) > MAX_NAME:
-            raise UserError(f"Der Name ist zu lang (höchstens {MAX_NAME} Zeichen).")
+            raise UserError("Der Name ist zu lang (höchstens {n} Zeichen).", n=MAX_NAME)
         return name
 
     @staticmethod
@@ -238,7 +241,7 @@ class ProgramStore:
             programs = self._read()
             i = self._find(programs, name)
             if i is not None and (programs[i].get("kind") == "advanced") != (entry.get("kind") == "advanced"):
-                raise UserError(f"„{programs[i]['name']}“ ist ein Programm aus dem anderen Modus. Wähle einen anderen Namen.")
+                raise UserError("„{name}“ ist ein Programm aus dem anderen Modus. Wähle einen anderen Namen.", name=programs[i]["name"])
             # every program it uses must exist, and none may lead back to it (that would never end)
             lookup = {p.get("name", "").casefold(): p for p in programs}
             lookup[name.casefold()] = entry
@@ -247,7 +250,7 @@ class ProgramStore:
             if i is not None:
                 programs[i] = entry               # same name: overwrite
             elif len(programs) >= MAX_SAVED:
-                raise UserError(f"Es sind schon {MAX_SAVED} Programme gespeichert. Lösche zuerst eins.")
+                raise UserError("Es sind schon {n} Programme gespeichert. Lösche zuerst eins.", n=MAX_SAVED)
             else:
                 programs.append(entry)
             self._write(programs)
@@ -256,7 +259,7 @@ class ProgramStore:
     @staticmethod
     def _get(lookup, name):
         if name.casefold() not in lookup:
-            raise UserError(f"Das Programm „{name}“ gibt es nicht (mehr).")
+            raise UserError("Das Programm „{name}“ gibt es nicht (mehr).", name=name)
         return lookup[name.casefold()]
 
     def load_for_run(self, name):
@@ -272,7 +275,7 @@ class ProgramStore:
             users = [p["name"] for p in programs
                      if any(n.casefold() == programs[i]["name"].casefold() for n in self._uses(p))]
             if users:
-                raise UserError(f"„{programs[i]['name']}“ wird in „{users[0]}“ benutzt. Nimm es dort zuerst heraus.")
+                raise UserError("„{name}“ wird in „{user}“ benutzt. Nimm es dort zuerst heraus.", name=programs[i]["name"], user=users[0])
             del programs[i]
             self._write(programs)
 
@@ -286,7 +289,7 @@ class ProgramStore:
                 raise UserError("Dieses Programm gibt es nicht (mehr).")
             j = self._find(programs, new_name)
             if j is not None and j != i:
-                raise UserError(f"„{programs[j]['name']}“ gibt es schon. Wähle einen anderen Namen.")
+                raise UserError("„{name}“ gibt es schon. Wähle einen anderen Namen.", name=programs[j]["name"])
             old = programs[i]["name"]
             programs[i] = {**programs[i], "name": new_name, "symbol": symbol}
             for p in programs:
@@ -296,17 +299,17 @@ class ProgramStore:
             self._write(programs)
         return {"name": new_name, "symbol": symbol, "old": old}
 
-    def duplicate(self, name):
+    def duplicate(self, name, lang="de"):
         with self._lock:
             programs = self._read()
             i = self._find(programs, str(name))
             if i is None:
                 raise UserError("Dieses Programm gibt es nicht (mehr).")
             if len(programs) >= MAX_SAVED:
-                raise UserError(f"Es sind schon {MAX_SAVED} Programme gespeichert. Lösche zuerst eins.")
+                raise UserError("Es sind schon {n} Programme gespeichert. Lösche zuerst eins.", n=MAX_SAVED)
             n = 1
             while True:
-                suffix = " (Kopie)" if n == 1 else f" (Kopie {n})"
+                suffix = tr(lang, " (Kopie)") if n == 1 else tr(lang, " (Kopie {n})", n=n)
                 copy = programs[i]["name"][:MAX_NAME - len(suffix)].rstrip() + suffix
                 if self._find(programs, copy) is None:
                     break
@@ -336,8 +339,8 @@ def simple_stmt(b, sid):
             sec = max(BEEP_SEC[0], min(BEEP_SEC[1], float(b.get("sec", BLOCK_DEFAULTS["beep", "sec"]))))
             return {"id": sid, "do": "beep", "hz": hz, "sec": sec, "wait": True}
     except (TypeError, ValueError):
-        raise UserError(f"Ungültige Einstellung bei Baustein '{kind}'")
-    raise UserError(f"Unbekannter Baustein: {kind}")
+        raise UserError("Ungültige Einstellung bei Baustein „{kind}“", kind=kind)
+    raise UserError("Unbekannter Baustein: {kind}", kind=kind)
 
 
 def blocks_to_ast(blocks, load=PROGRAMS.load_for_run, name=None):
@@ -360,12 +363,12 @@ def blocks_to_ast(blocks, load=PROGRAMS.load_for_run, name=None):
                     continue
                 sub_name = str(b.get("name", ""))
                 if sub_name.casefold() in stack:
-                    raise UserError(f"„{sub_name}“ benutzt sich selbst – dann würde es nie fertig.")
+                    raise UserError("„{name}“ benutzt sich selbst – dann würde es nie fertig.", name=sub_name)
                 if len(stack) >= MAX_NESTING:
-                    raise UserError(f"Zu viele Programme ineinander (höchstens {MAX_NESTING}).")
+                    raise UserError("Zu viele Programme ineinander (höchstens {n}).", n=MAX_NESTING)
                 sub = load(sub_name)
                 if sub.get("kind") == "advanced":
-                    raise UserError(f"„{sub_name}“ ist ein Profi-Programm und kann hier nicht als Baustein benutzt werden.")
+                    raise UserError("„{name}“ ist ein Profi-Programm und kann hier nicht als Baustein benutzt werden.", name=sub_name)
                 fname = sub["name"]
                 if fname not in functions:
                     functions[fname] = {"params": [], "body": []}      # reserved: the body may use it again
@@ -385,7 +388,7 @@ def compile_ast(ast, cal):
     try:
         return compile_program(ast, cal)
     except CompileError as exc:
-        raise UserError(str(exc), exc.block)
+        raise UserError(exc.msg, exc.block)
 
 
 def count_statements(ast):
@@ -401,7 +404,7 @@ def request_ast(body):
         return body["ast"]
     blocks = body.get("blocks") or []
     if len(blocks) > MAX_BLOCKS:
-        raise UserError(f"Zu viele Bausteine (höchstens {MAX_BLOCKS}).")
+        raise UserError("Zu viele Bausteine (höchstens {n}).", n=MAX_BLOCKS)
     return blocks_to_ast(blocks, name=body.get("name") or None)
 
 
@@ -515,7 +518,7 @@ class TcpLink:
             pass
 
 
-def wifi_scan(seconds=1.5):
+def wifi_scan(lang="de", seconds=1.5):
     """Ask every Pico bridge on the local network to report its address."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -534,7 +537,7 @@ def wifi_scan(seconds=1.5):
                 found[f"{parts[1]}:{parts[2]}"] = True
     finally:
         s.close()
-    return [{"address": a, "name": "mBot (WLAN)"} for a in found]
+    return [{"address": a, "name": tr(lang, "mBot (WLAN)")} for a in found]
 
 
 class BleLink:
@@ -553,7 +556,7 @@ class BleLink:
         threading.Thread(target=self._run, daemon=True).start()
         if not self._ready.wait(25) or self._error:
             self.close()
-            raise UserError(self._error or "Bluetooth-Verbindung hat zu lange gedauert.")
+            raise UserError(self._error or Msg("Bluetooth-Verbindung hat zu lange gedauert."))
 
     def _run(self):
         self._loop.run_until_complete(self._main())
@@ -571,10 +574,10 @@ class BleLink:
                 gone = asyncio.ensure_future(self._watch(client))
                 await asyncio.wait([done, gone], return_when=asyncio.FIRST_COMPLETED)
         except Exception as exc:
-            self._error = f"Bluetooth: {exc}"
+            self._error = Msg("Bluetooth: {error}", error=str(exc))
             if "not found" in str(exc):
-                self._error = ("Roboter nicht gefunden. Ist er eingeschaltet und blinkt die LED am "
-                               "Bluetooth-Modul? (Dauerlicht = schon mit einem anderen Gerät verbunden)")
+                self._error = Msg("Roboter nicht gefunden. Ist er eingeschaltet und blinkt die LED am "
+                                  "Bluetooth-Modul? (Dauerlicht = schon mit einem anderen Gerät verbunden)")
         finally:
             self._ready.set()
             if self._alive and self._connected:
@@ -609,22 +612,22 @@ def ble_scan(seconds=6):
     return asyncio.run(go())
 
 
-def list_ports():
+def list_ports(lang="de"):
     from serial.tools import list_ports as lp
 
     found = []
     for p in sorted(lp.comports(), key=lambda p: p.device):
         if p.vid == 0x1A86:                      # CH340: the USB-serial chip on the mCore
-            label = f"mBot (USB-Kabel) – {p.device}"
+            label = tr(lang, "mBot (USB-Kabel) – {port}", port=p.device)
         elif p.device.startswith(("/dev/ttyUSB", "/dev/ttyACM")):
-            label = f"{p.description or 'USB-Gerät'} – {p.device}"
+            label = f"{p.description or tr(lang, 'USB-Gerät')} – {p.device}"
         else:
             continue
         found.append({"path": p.device, "label": label})
-    found += [{"path": p, "label": f"Bluetooth-Seriell – {p}"} for p in sorted(glob.glob("/dev/rfcomm*"))]
+    found += [{"path": p, "label": tr(lang, "Bluetooth-Seriell – {port}", port=p)} for p in sorted(glob.glob("/dev/rfcomm*"))]
     sim = HERE.parent / "sim" / "tty"          # created by sim/fake_mbot.py while it runs
     if sim.exists():
-        found.append({"path": str(sim), "label": "Simulator (ohne Roboter)"})
+        found.append({"path": str(sim), "label": tr(lang, "Simulator (ohne Roboter)")})
     return found
 
 
@@ -706,7 +709,7 @@ class Robot:
         elif kind == "FAULT":
             self._ended()
             code = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 0
-            self.error = f"Das Programm ist abgebrochen: {FAULTS.get(code, f'Fehler {code}')}."
+            self.error = Msg("Das Programm ist abgebrochen: {fault}.", fault=Msg(FAULTS[code]) if code in FAULTS else Msg("Fehler {code}", code=code))
             self._changed()
         elif kind == "READY":
             self._loaded = None                     # the board was reset (USB open, brown-out): program gone
@@ -720,7 +723,7 @@ class Robot:
 
     def _on_close(self):
         self._link, self.link_name, self.firmware, self._loaded, self.tel = None, None, None, None, None
-        self.error = "Verbindung zum Roboter verloren."
+        self.error = Msg("Verbindung zum Roboter verloren.")
         self._ended()
 
     # --- helpers
@@ -736,7 +739,7 @@ class Robot:
     @staticmethod
     def _check(reply):
         if reply != "OK":
-            raise UserError(f"Roboter meldet: {reply}")
+            raise UserError("Roboter meldet: {reply}", reply=reply)
 
     def connected(self):
         return self._link is not None
@@ -752,7 +755,7 @@ class Robot:
             except UserError:
                 raise
             except Exception as exc:
-                raise UserError(f"Verbinden nicht möglich: {exc}")
+                raise UserError("Verbinden nicht möglich: {error}", error=str(exc))
             self.link_name = target
             # a USB open resets the board; keep asking until the firmware answers
             for _ in range(8):
@@ -767,8 +770,8 @@ class Robot:
                         version = 0
                     if version != VERSION:
                         self.disconnect()
-                        raise UserError(f"Die Firmware auf dem Roboter ist Version {version}, der Server braucht "
-                                        f"Version {VERSION}. Spiel die passende mit ./flash.sh auf.")
+                        raise UserError("Die Firmware auf dem Roboter ist Version {have}, der Server braucht "
+                                        "Version {need}. Spiel die passende mit ./flash.sh auf.", have=version, need=VERSION)
                     self.firmware = reply
                     try:
                         self.prog_max = int(reply.split()[3])
@@ -803,7 +806,7 @@ class Robot:
                 raise UserError("Der Roboter ist nicht verbunden.")
             code, nvars = result["code"], result["nvars"]
             if len(code) > self.prog_max:
-                raise UserError(f"Das Programm ist zu groß für den Roboter ({len(code)} von {self.prog_max} Bytes).")
+                raise UserError("Das Programm ist zu groß für den Roboter ({size} von {max} Bytes).", size=len(code), max=self.prog_max)
             self._link.write(b"STOP\n")           # also ends remote control
             if self._loaded != (code, nvars):
                 self._loaded = None
@@ -836,7 +839,7 @@ class Robot:
                 self._link.write(b"STOP\n")
             self._ended()
 
-    def state(self):
+    def state(self, lang="de"):
         tel, prog = self.tel, self._program
         block = self._block if self.running else None
         top = self._top if self.running else None
@@ -855,11 +858,12 @@ class Robot:
         names = prog["vars"] if prog else []
         return {
             "connected": self.connected(), "link": self.link_name, "firmware": self.firmware,
-            "running": self.running, "max_size": self.prog_max, "auto": self.auto,
+            "running": self.running, "max_size": self.prog_max,
+            "auto": self.auto and {**self.auto, **({"error": tr(lang, self.auto["error"])} if "error" in self.auto else {})},
             "block": block, "top_block": top, "block_ms": block_ms, "block_done_ms": done_ms,
             "sensors": sensors,
             "vars": [{"name": n, "value": self._vars[i] if i < len(self._vars) else 0} for i, n in enumerate(names)],
-            "error": self.error,
+            "error": self.error and tr(lang, self.error),
         }
 
 
@@ -896,7 +900,7 @@ def autoconnect(robot, kind, target, tries=AUTOCONNECT_TRIES, pause=AUTOCONNECT_
             remember_connection(kind, target)
             return True
         except UserError as exc:
-            error = str(exc)
+            error = exc.msg
         if attempt < tries:
             sleep(pause)
     robot.auto = {"state": "failed", "tries": tries, "kind": kind, "target": target, "error": error}
@@ -915,20 +919,25 @@ class Handler(BaseHTTPRequestHandler):
         if not any(p in str(args[0] if args else "") for p in ("/api/state", "/api/remote", "/api/compile", "/api/events")):
             super().log_message(fmt, *args)
 
+    def _lang(self):
+        """The reader's language: the page sends it as X-Lang (fetch) or ?lang= (EventSource)."""
+        query = dict(part.partition("=")[::2] for part in self.path.partition("?")[2].split("&") if part)
+        return lang_of(self.headers.get("X-Lang") or query.get("lang"))
+
     def _events(self):
         """Server-sent events: the robot state whenever it changes (at most every 50 ms), a heartbeat otherwise."""
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
-        last, seen = None, -1
+        last, seen, lang = None, -1, self._lang()
         try:
             while True:
                 with ROBOT.changed:
                     if ROBOT.version == seen:
                         ROBOT.changed.wait(1.0)
                     seen = ROBOT.version
-                data = json.dumps(ROBOT.state())
+                data = json.dumps(ROBOT.state(lang))
                 if data != last:
                     self.wfile.write(f"data: {data}\n\n".encode())
                     last = data
@@ -953,12 +962,12 @@ class Handler(BaseHTTPRequestHandler):
         return json.loads(self.rfile.read(length) or b"{}") if length else {}
 
     def do_GET(self):
-        path = self.path.split("?")[0]
+        path, lang = self.path.split("?")[0], self._lang()
         if path == "/api/state":
-            return self._json({**ROBOT.state(), "calibration": load_json(CAL_FILE, DEFAULT_CAL),
+            return self._json({**ROBOT.state(lang), "calibration": load_json(CAL_FILE, DEFAULT_CAL),
                                "settings": load_json(SETTINGS_FILE, {})})
         if path == "/api/ports":
-            return self._json({"ports": list_ports()})
+            return self._json({"ports": list_ports(lang)})
         if path == "/api/events":
             return self._events()
         if path == "/api/programs":
@@ -966,14 +975,14 @@ class Handler(BaseHTTPRequestHandler):
                                "max_size": ROBOT.prog_max})
         if path == "/api/scan-wifi":
             try:
-                return self._json({"devices": wifi_scan()})
+                return self._json({"devices": wifi_scan(lang)})
             except OSError as exc:
-                return self._json({"error": f"WLAN-Suche fehlgeschlagen: {exc}"}, 500)
+                return self._json({"error": tr(lang, "WLAN-Suche fehlgeschlagen: {error}", error=str(exc))}, 500)
         if path == "/api/scan":
             try:
                 return self._json({"devices": ble_scan()})
             except Exception as exc:
-                return self._json({"error": f"Bluetooth-Suche fehlgeschlagen: {exc}"}, 500)
+                return self._json({"error": tr(lang, "Bluetooth-Suche fehlgeschlagen: {error}", error=str(exc))}, 500)
         rel = "index.html" if path == "/" else path.lstrip("/")
         file = (WEB / rel).resolve()
         if WEB not in file.parents or not file.is_file():
@@ -988,6 +997,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_POST(self):
+        lang = self._lang()
         try:
             body = self._body()
             path = self.path
@@ -1024,7 +1034,7 @@ class Handler(BaseHTTPRequestHandler):
             elif path == "/api/programs/rename":
                 return self._json({"ok": True, **PROGRAMS.rename(body.get("name"), body.get("new_name"), body.get("symbol"))})
             elif path == "/api/programs/duplicate":
-                return self._json({"ok": True, **PROGRAMS.duplicate(body.get("name"))})
+                return self._json({"ok": True, **PROGRAMS.duplicate(body.get("name"), lang)})
             elif path == "/api/compile":
                 # how much of the robot's memory the editor's program needs, or why it can't run; with
                 # "listing": true also the disassembly (for debugging the compiler)
@@ -1032,7 +1042,7 @@ class Handler(BaseHTTPRequestHandler):
                     result = compile_ast(request_ast(body), load_json(CAL_FILE, DEFAULT_CAL))
                     size, error, block = result["size"], None, None
                 except UserError as exc:
-                    result, size, error, block = None, None, str(exc), exc.block
+                    result, size, error, block = None, None, exc.msg.render(lang), exc.block
                 out = {"ok": True, "size": size, "error": error, "error_block": block, "max_size": ROBOT.prog_max}
                 if body.get("listing") and result:
                     out["listing"] = listing(result)
@@ -1042,9 +1052,9 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self._json({"ok": True})
         except UserError as exc:
-            self._json({"ok": False, "error": str(exc)}, 400)
+            self._json({"ok": False, "error": exc.msg.render(lang)}, 400)
         except (ValueError, KeyError) as exc:
-            self._json({"ok": False, "error": f"Ungültige Anfrage: {exc}"}, 400)
+            self._json({"ok": False, "error": tr(lang, "Ungültige Anfrage: {error}", error=str(exc))}, 400)
 
 
 def main():

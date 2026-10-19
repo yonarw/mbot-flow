@@ -11,9 +11,10 @@ const ICONS = {
   bell: '<path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4"/>',
 };
 
-// Notes C D E F G A H, then C2 … H2, C3 … H3 and a last C4 (German naming: H = B). A = 440 Hz is the A of the first octave.
+// Notes C D E F G A H, then C2 … H2, C3 … H3 and a last C4 (German naming: H = B; English: B). A = 440 Hz is the A
+// of the first octave.
 const NOTES = (() => {
-  const names = ["C", "D", "E", "F", "G", "A", "H"], semitones = [0, 2, 4, 5, 7, 9, 11], notes = [];
+  const names = ["C", "D", "E", "F", "G", "A", LANG === "de" ? "H" : "B"], semitones = [0, 2, 4, 5, 7, 9, 11], notes = [];
   const add = (name, octave, semi) => notes.push({
     name: name + (octave ? octave + 1 : ""), hz: Math.round(261.6256 * 2 ** ((12 * octave + semi) / 12)),
   });
@@ -23,7 +24,8 @@ const NOTES = (() => {
 })();
 // Sharps aren't in the menu (to keep it short) but saved programs may use them, e.g. "Für Elise" (Dis2 = 622 Hz).
 // A frequency that is not a note at all still shows up as plain Hz.
-const NOTE_NAMES = ["C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "B", "H"];   // German: B = A sharp
+const NOTE_NAMES = LANG === "de" ? ["C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "B", "H"]   // German: B = A sharp
+                                  : ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const noteLabel = hz => {
   const semi = Math.round(12 * Math.log2(hz / 261.6256));
   if (semi < 0 || semi > 36 || Math.round(261.6256 * 2 ** (semi / 12)) !== hz) return `${hz} Hz`;
@@ -31,30 +33,30 @@ const noteLabel = hz => {
   return NOTE_NAMES[semi % 12] + (octave ? octave + 1 : "");
 };
 
-const STEPS = { key: "n", def: 1, min: 1, max: 20, unit: n => (n === 1 ? "Schritt" : "Schritte") };
-const ANGLE = { key: "deg", def: 90, options: [45, 90, 135, 180, 270, 360], fmt: o => `${o}°`, aria: "Winkel" };
-const SECONDS = o => `${de(o)} Sek.`;
+const STEPS = { key: "n", def: 1, min: 1, max: 20, unit: n => (n === 1 ? tr("Schritt") : tr("Schritte")) };
+const ANGLE = { key: "deg", def: 90, options: [45, 90, 135, 180, 270, 360], fmt: o => `${o}°`, aria: tr("Winkel") };
+const SECONDS = o => tr("{n} Sek.", { n: fmtNum(o) });
 const SHORT_TIMES = [0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3];
 
 const BLOCKS = {
-  forward:  { label: "Vorwärts",      cls: "move", icon: "up",    params: [STEPS] },
-  backward: { label: "Rückwärts",     cls: "move", icon: "down",  params: [STEPS] },
-  left:     { label: "Links drehen",  cls: "turn", icon: "left",  params: [ANGLE] },
-  right:    { label: "Rechts drehen", cls: "turn", icon: "right", params: [ANGLE] },
-  wait:     { label: "Warten",        cls: "wait", icon: "pause", params: [
-    { key: "sec", def: 1, options: [...SHORT_TIMES, 4, 5, 10, 15, 20, 30], fmt: SECONDS, aria: "Dauer" },
+  forward:  { label: tr("Vorwärts"),      cls: "move", icon: "up",    params: [STEPS] },
+  backward: { label: tr("Rückwärts"),     cls: "move", icon: "down",  params: [STEPS] },
+  left:     { label: tr("Links drehen"),  cls: "turn", icon: "left",  params: [ANGLE] },
+  right:    { label: tr("Rechts drehen"), cls: "turn", icon: "right", params: [ANGLE] },
+  wait:     { label: tr("Warten"),        cls: "wait", icon: "pause", params: [
+    { key: "sec", def: 1, options: [...SHORT_TIMES, 4, 5, 10, 15, 20, 30], fmt: SECONDS, aria: tr("Dauer") },
   ] },
-  beep:     { label: "Hupen",         cls: "beep", icon: "bell",  params: [
-    { key: "hz", def: 880, options: NOTES.map(n => n.hz), fmt: noteLabel, aria: "Ton" },
-    { key: "sec", def: 0.25, options: SHORT_TIMES, fmt: SECONDS, aria: "Dauer" },
+  beep:     { label: tr("Hupen"),         cls: "beep", icon: "bell",  params: [
+    { key: "hz", def: 880, options: NOTES.map(n => n.hz), fmt: noteLabel, aria: tr("Ton") },
+    { key: "sec", def: 0.25, options: SHORT_TIMES, fmt: SECONDS, aria: tr("Dauer") },
   ] },
   // a saved program used as one block ({ type: "program", name }); the server expands it when it runs
-  program:  { label: "Programm",      cls: "sub", palette: false },
+  program:  { label: tr("Programm"),      cls: "sub", palette: false },
 };
 const STORE_KEY = "mbot-program-v1";
 const MODE_KEY = "mbot-mode";
 const BLOCKLY_SCRIPTS = ["vendor/blockly/blockly_compressed.js", "vendor/blockly/blocks_compressed.js",
-                         "vendor/blockly/msg/de.js", "vendor/blockly/continuous-toolbox.js", "advanced.js"];
+                         `vendor/blockly/msg/${LANG}.js`, "vendor/blockly/continuous-toolbox.js", "advanced.js"];
 
 // --- tiny helpers -----------------------------------------------------------
 
@@ -84,14 +86,13 @@ function icon(name) {
   return svg;
 }
 
-const de = n => String(n).replace(".", ",");
-
 async function api(path, body) {
-  const res = await fetch(path, body === undefined ? {} : {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+  const headers = { "X-Lang": LANG };          // the server answers in the page's language
+  const res = await fetch(path, body === undefined ? { headers } : {
+    method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok || data.ok === false) throw new Error(data.error || `Fehler (${res.status})`);
+  if (!res.ok || data.ok === false) throw new Error(data.error || tr("Fehler ({status})", { status: res.status }));
   return data;
 }
 
@@ -100,7 +101,7 @@ async function api(path, body) {
 let program = [];
 let mode = "simple";              // "simple": the list of big blocks; "advanced": Profi, see `view`
 let view = "blocks";              // Profi's view of its one program: "blocks" (Blockly, advanced.js) or "flow" (flowchart, flow.js)
-const MODE_LABELS = { simple: "Einfach", advanced: "Profi" };
+const MODE_LABELS = { simple: tr("Einfach"), advanced: tr("Profi") };
 const VIEW_KEY = "mbot-view";
 const SYNC_KEY = "mbot-view-synced";
 let server = { connected: false, running: false, block: null, calibration: null, settings: {} };
@@ -156,19 +157,19 @@ function paramControl(p, b, index) {
     }, options.map(o => h("option", { value: o, selected: o === b[p.key] }, p.fmt(o)))));
     return param;
   }
-  const val = h("span", { class: "val" }, de(b[p.key]));
+  const val = h("span", { class: "val" }, fmtNum(b[p.key]));
   const unit = h("span", { class: "unit" }, p.unit(b[p.key]));
   const bump = d => {
     const next = Math.max(p.min, Math.min(p.max, program[index][p.key] + d));
     program[index][p.key] = next;
-    val.textContent = de(next);
+    val.textContent = fmtNum(next);
     unit.textContent = p.unit(next);
     save();
   };
   param.append(
-    h("button", { class: "mini", type: "button", "aria-label": "weniger", onclick: () => bump(-1) }, "−"),
+    h("button", { class: "mini", type: "button", "aria-label": tr("weniger"), onclick: () => bump(-1) }, "−"),
     val,
-    h("button", { class: "mini", type: "button", "aria-label": "mehr", onclick: () => bump(1) }, "+"),
+    h("button", { class: "mini", type: "button", "aria-label": tr("mehr"), onclick: () => bump(1) }, "+"),
     unit,
   );
   return param;
@@ -221,7 +222,7 @@ function blockedPrograms() {
 
 function useProgram(name, at) {
   if (blockedPrograms().has(name.toLowerCase())) {
-    showError(`„${name}“ geht hier nicht: es benutzt „${current.simple.name}“ – das würde sich selbst aufrufen und nie fertig.`);
+    showError(tr("„{name}“ geht hier nicht: es benutzt „{own}“ – das würde sich selbst aufrufen und nie fertig.", { name, own: current.simple.name }));
     return;
   }
   insertBlock({ type: "program", name }, at);
@@ -231,22 +232,22 @@ function renderMine() {
   const root = $("#my-programs");
   if (!savedPrograms) return;
   const blocked = blockedPrograms();
-  const list = savedPrograms.filter(p => p.kind === "simple").sort((a, b) => a.name.localeCompare(b.name, "de"));
+  const list = savedPrograms.filter(p => p.kind === "simple").sort((a, b) => a.name.localeCompare(b.name, LANG));
   root.replaceChildren(...(list.length ? list.map(p => blocked.has(p.name.toLowerCase()) ? h("div", {
     class: "block sub blocked", "aria-disabled": "true",
     title: p.name.toLowerCase() === current.simple.name.toLowerCase()
-      ? "Das ist das Programm, an dem du gerade baust – es kann sich nicht selbst benutzen."
-      : `„${p.name}“ benutzt „${current.simple.name}“ – hier eingebaut würde es sich selbst aufrufen.`,
+      ? tr("Das ist das Programm, an dem du gerade baust – es kann sich nicht selbst benutzen.")
+      : tr("„{name}“ benutzt „{own}“ – hier eingebaut würde es sich selbst aufrufen.", { name: p.name, own: current.simple.name }),
   }, h("span", { class: "sym", "aria-hidden": "true" }, p.symbol), h("span", { class: "label" }, p.name),
     h("span", { class: "unit" }, "🚫")) : h("div", {
     class: "block sub", role: "button", tabindex: "0", draggable: "true",
-    title: `${p.blocks} ${p.blocks === 1 ? "Baustein" : "Bausteine"}`,
+    title: blockCount(p.blocks),
     onclick: () => useProgram(p.name),
     onkeydown: e => { if (e.key === "Enter") { e.preventDefault(); useProgram(p.name); } },
     ondragstart: e => { e.dataTransfer.setData("text/plain", `prog:${p.name}`); e.dataTransfer.effectAllowed = "copy"; },
   }, h("span", { class: "sym", "aria-hidden": "true" }, p.symbol), h("span", { class: "label" }, p.name),
     p.size != null ? h("span", { class: "unit" }, sizeLabel(p.size)) : null))
-    : [h("p", { class: "mine-empty" }, "Noch nichts gespeichert. Speichere ein Programm mit 💾 – dann taucht es hier auf.")]));
+    : [h("p", { class: "mine-empty" }, tr("Noch nichts gespeichert. Speichere ein Programm mit 💾 – dann taucht es hier auf."))]));
 }
 
 async function refreshMine() {
@@ -267,7 +268,7 @@ function renderProgram() {
     const li = h("li", {
       class: `block ${def.cls}` + (missing ? " missing" : "") + (stepCount.errorBlock === String(i) ? " error" : "")
         + (server.running && server.top_block === String(i) ? " active" : ""),
-      title: missing ? "Dieses Programm gibt es nicht mehr." : stepCount.errorBlock === String(i) ? stepCount.error : null,
+      title: missing ? tr("Dieses Programm gibt es nicht mehr.") : stepCount.errorBlock === String(i) ? stepCount.error : null,
       draggable: "true", "data-index": i,
       ondragstart: e => {
         e.dataTransfer.setData("text/plain", `move:${i}`);
@@ -278,9 +279,9 @@ function renderProgram() {
     },
     blockBody(def, b, i),
     h("span", { class: "tools" },
-      h("button", { class: "mini", type: "button", "aria-label": "nach oben", disabled: i === 0, onclick: () => moveBlock(i, i - 1) }, "▲"),
-      h("button", { class: "mini", type: "button", "aria-label": "nach unten", disabled: i === program.length - 1, onclick: () => moveBlock(i, i + 1) }, "▼"),
-      h("button", { class: "mini", type: "button", "aria-label": "löschen", onclick: () => removeBlock(i) }, "✕")));
+      h("button", { class: "mini", type: "button", "aria-label": tr("nach oben"), disabled: i === 0, onclick: () => moveBlock(i, i - 1) }, "▲"),
+      h("button", { class: "mini", type: "button", "aria-label": tr("nach unten"), disabled: i === program.length - 1, onclick: () => moveBlock(i, i + 1) }, "▼"),
+      h("button", { class: "mini", type: "button", "aria-label": tr("löschen"), onclick: () => removeBlock(i) }, "✕")));
     list.append(li);
   });
 }
@@ -370,8 +371,8 @@ function setupDrop() {
 
 function requireConnection() {
   if (server.connected) return true;
-  if (server.auto && server.auto.state === "trying") { showError("Einen Moment – ich verbinde gerade mit dem Roboter."); return false; }
-  showError("Der Roboter ist noch nicht verbunden.");
+  if (server.auto && server.auto.state === "trying") { showError(tr("Einen Moment – ich verbinde gerade mit dem Roboter.")); return false; }
+  showError(tr("Der Roboter ist noch nicht verbunden."));
   openConnect();
   return false;
 }
@@ -382,7 +383,7 @@ async function run() {
     if (!profi()) return;
     try { body = { ast: profi().toAst() }; } catch (e) { showError(e.message); return; }
   } else {
-    if (!program.length) { showError("Zieh zuerst ein paar Bausteine ins Programm."); return; }
+    if (!program.length) { showError(tr("Zieh zuerst ein paar Bausteine ins Programm.")); return; }
     body = { blocks: program };
   }
   if (!requireConnection()) return;
@@ -393,7 +394,7 @@ async function stop() {
 }
 
 function linkLabel(link) {
-  if (link.endsWith("sim/tty")) return "Simulator";
+  if (link.endsWith("sim/tty")) return tr("Simulator");
   return link.split("/").pop();          // /dev/ttyUSB0 -> ttyUSB0, a BLE address stays as it is
 }
 
@@ -407,15 +408,15 @@ function applyState(s) {
     ? { block: s.top_block, done: s.block_done_ms, total: s.block_ms, at: performance.now() } : null;
   const chip = $("#status"), auto = s.auto;
   chip.className = "chip " + (s.connected ? "on" : "off");
-  chip.textContent = s.connected ? `● Verbunden (${linkLabel(s.link)})`
-    : auto && auto.state === "trying" ? `◌ Verbinde … (Versuch ${auto.attempt} von ${auto.tries})`
-    : "○ Nicht verbunden";
+  chip.textContent = s.connected ? tr("● Verbunden ({link})", { link: linkLabel(s.link) })
+    : auto && auto.state === "trying" ? tr("◌ Verbinde … (Versuch {n} von {tries})", { n: auto.attempt, tries: auto.tries })
+    : tr("○ Nicht verbunden");
   // the server tried the last connection at startup and gave up: ask, once per failed round
   const failed = !s.connected && auto && auto.state === "failed";
   if (failed && !autoDialogShown) {
     autoDialogShown = true;
     openConnect();
-    setMsg($("#dlg-connect-msg"), `Automatisch verbinden (${linkLabel(auto.target)}) hat ${auto.tries}× nicht geklappt: ${auto.error}`, "err");
+    setMsg($("#dlg-connect-msg"), tr("Automatisch verbinden ({link}) hat {tries}× nicht geklappt: {error}", { link: linkLabel(auto.target), tries: auto.tries, error: auto.error }), "err");
   }
   if (!failed) autoDialogShown = false;
   document.querySelectorAll('[data-action="run"]').forEach(b => { b.disabled = s.running; });
@@ -434,12 +435,12 @@ async function poll() {
     applyState(await api("/api/state"));
   } catch (_) {
     $("#status").className = "chip off";
-    $("#status").textContent = "○ Server nicht erreichbar";
+    $("#status").textContent = tr("○ Server nicht erreichbar");
   }
 }
 
 function listen() {
-  const events = new EventSource("/api/events");     // reconnects by itself
+  const events = new EventSource(`/api/events?lang=${LANG}`);     // reconnects by itself
   events.onmessage = e => { try { applyState(JSON.parse(e.data)); } catch (_) { /* ignore */ } };
 }
 
@@ -452,11 +453,11 @@ function renderLive(s) {
   if (!sn) return;
   $("#s-line-left").classList.toggle("black", sn.line_left);
   $("#s-line-right").classList.toggle("black", sn.line_right);
-  $("#s-distance").textContent = sn.distance >= 400 ? "frei" : `${sn.distance} cm`;
+  $("#s-distance").textContent = sn.distance >= 400 ? tr("frei") : `${sn.distance} cm`;
   $("#s-light").textContent = sn.light;
-  $("#s-button").textContent = sn.button ? "gedrückt" : "–";
-  $("#s-motors").textContent = sn.motor_left || sn.motor_right ? `${sn.motor_left} % · ${sn.motor_right} %` : "aus";
-  $("#s-timer").textContent = s.running ? `${de((sn.timer / 1000).toFixed(1))} s` : "–";
+  $("#s-button").textContent = sn.button ? tr("gedrückt") : "–";
+  $("#s-motors").textContent = sn.motor_left || sn.motor_right ? `${sn.motor_left} % · ${sn.motor_right} %` : tr("aus");
+  $("#s-timer").textContent = s.running ? `${fmtNum((sn.timer / 1000).toFixed(1))} s` : "–";
   const vars = s.vars || [], box = $("#vars"), names = vars.map(v => v.name).join("\n");
   box.hidden = !vars.length;
   if (names !== varNames) {
@@ -476,7 +477,7 @@ async function refreshPorts() {
     const { ports } = await api("/api/ports");
     sel.replaceChildren(...(ports.length
       ? ports.map(p => h("option", { value: p.path }, p.label))
-      : [h("option", { value: "" }, "– kein Anschluss gefunden –")]));
+      : [h("option", { value: "" }, tr("– kein Anschluss gefunden –"))]));
     if (server.settings && server.settings.kind === "serial") sel.value = server.settings.target;
   } catch (e) { setMsg($("#dlg-connect-msg"), e.message, "err"); }
 }
@@ -492,11 +493,11 @@ function openConnect() {
 
 async function connect(kind, target) {
   const msg = $("#dlg-connect-msg");
-  if (!target) { setMsg(msg, "Bitte erst etwas auswählen.", "err"); return; }
-  setMsg(msg, "Verbinde …");
+  if (!target) { setMsg(msg, tr("Bitte erst etwas auswählen."), "err"); return; }
+  setMsg(msg, tr("Verbinde …"));
   try {
     await api("/api/connect", { kind, target });
-    setMsg(msg, "Verbunden!", "ok");
+    setMsg(msg, tr("Verbunden!"), "ok");
     await poll();
     setTimeout(() => $("#dlg-connect").close(), 600);
   } catch (e) { setMsg(msg, e.message, "err"); }
@@ -505,15 +506,15 @@ async function connect(kind, target) {
 async function scanBle() {
   const msg = $("#dlg-connect-msg"), btn = $("#ble-scan");
   btn.disabled = true;
-  setMsg(msg, "Suche Bluetooth-Geräte …");
+  setMsg(msg, tr("Suche Bluetooth-Geräte …"));
   try {
     const { devices } = await api("/api/scan");
     const likely = d => /makeblock|mbot/i.test(d.name);
     devices.sort((a, b) => likely(b) - likely(a));
     $("#ble-select").replaceChildren(...(devices.length
-      ? devices.map(d => h("option", { value: d.address }, `${d.name || "(ohne Namen)"} – ${d.address}`))
-      : [h("option", { value: "" }, "– nichts gefunden –")]));
-    setMsg(msg, devices.length ? `${devices.length} Gerät(e) gefunden.` : "Nichts gefunden. Ist der Roboter an?", devices.length ? "ok" : "err");
+      ? devices.map(d => h("option", { value: d.address }, `${d.name || tr("(ohne Namen)")} – ${d.address}`))
+      : [h("option", { value: "" }, tr("– nichts gefunden –"))]));
+    setMsg(msg, devices.length ? tr("{n} Gerät(e) gefunden.", { n: devices.length }) : tr("Nichts gefunden. Ist der Roboter an?"), devices.length ? "ok" : "err");
   } catch (e) { setMsg(msg, e.message, "err"); }
   btn.disabled = false;
 }
@@ -521,14 +522,14 @@ async function scanBle() {
 async function scanWifi() {
   const msg = $("#dlg-connect-msg"), btn = $("#wifi-scan");
   btn.disabled = true;
-  setMsg(msg, "Suche im WLAN …");
+  setMsg(msg, tr("Suche im WLAN …"));
   try {
     const { devices } = await api("/api/scan-wifi");
     $("#wifi-select").replaceChildren(...(devices.length
       ? devices.map(d => h("option", { value: d.address }, `${d.name} – ${d.address}`))
-      : [h("option", { value: "" }, "– nichts gefunden –")]));
+      : [h("option", { value: "" }, tr("– nichts gefunden –"))]));
     if (devices.length) $("#wifi-address").value = devices[0].address;
-    setMsg(msg, devices.length ? "Gefunden!" : "Nichts gefunden. Ist der Roboter an und blinkt die Pico-LED langsam?", devices.length ? "ok" : "err");
+    setMsg(msg, devices.length ? tr("Gefunden!") : tr("Nichts gefunden. Ist der Roboter an und blinkt die Pico-LED langsam?"), devices.length ? "ok" : "err");
   } catch (e) { setMsg(msg, e.message, "err"); }
   btn.disabled = false;
 }
@@ -552,13 +553,13 @@ function chosenSymbol() {
 let renaming = null;      // name of the saved program the save dialog renames, or null when it saves the editor's program
 
 function openSave() {
-  if (mode === "simple" && !program.length) { showError("Zieh zuerst ein paar Bausteine ins Programm."); return; }
+  if (mode === "simple" && !program.length) { showError(tr("Zieh zuerst ein paar Bausteine ins Programm.")); return; }
   if (mode === "advanced" && !profi()) return;
-  openNameDialog("Programm speichern", "Speichern", current[mode].name, current[mode].symbol, null);
+  openNameDialog(tr("Programm speichern"), tr("Speichern"), current[mode].name, current[mode].symbol, null);
 }
 
 function openRename(p) {
-  openNameDialog("Umbenennen", "Übernehmen", p.name, p.symbol, p.name);
+  openNameDialog(tr("Umbenennen"), tr("Übernehmen"), p.name, p.symbol, p.name);
 }
 
 function openNameDialog(title, button, name, symbol, renameFrom) {
@@ -574,7 +575,7 @@ function openNameDialog(title, button, name, symbol, renameFrom) {
 
 async function confirmSave() {
   const msg = $("#dlg-save-msg"), name = $("#save-name").value.trim().replace(/\s+/g, " "), symbol = chosenSymbol();
-  if (!name) { setMsg(msg, "Bitte gib dem Programm einen Namen.", "err"); $("#save-name").focus(); return; }
+  if (!name) { setMsg(msg, tr("Bitte gib dem Programm einen Namen."), "err"); $("#save-name").focus(); return; }
   try {
     if (renaming) {
       const res = await api("/api/programs/rename", { name: renaming, new_name: name, symbol });
@@ -585,7 +586,7 @@ async function confirmSave() {
     } else {
       const { programs } = await api("/api/programs");
       const clash = programs.find(p => p.name.toLowerCase() === name.toLowerCase());
-      if (clash && !confirm(`„${clash.name}“ gibt es schon. Überschreiben?`)) return;
+      if (clash && !confirm(tr("„{name}“ gibt es schon. Überschreiben?", { name: clash.name }))) return;
       // Profi: the document of the view it is shown in (Blockly's or the flowchart's); it opens in either view
       const body = mode === "advanced" ? { name, symbol, workspace: profi().state(), ast: profi().draftAst() }
                                        : { name, symbol, blocks: program };
@@ -604,32 +605,33 @@ async function openLoad() {
   await refreshSaved();
 }
 
-const sizeLabel = n => `${Math.max(1, Math.round((n / maxSize) * 100))} % Platz`;
+const sizeLabel = n => tr("{n} % Platz", { n: Math.max(1, Math.round((n / maxSize) * 100)) });
+const blockCount = n => (n === 1 ? tr("1 Baustein") : tr("{n} Bausteine", { n }));
 
 async function refreshSaved() {
   const list = $("#saved-list"), msg = $("#dlg-load-msg");
   try {
     const { programs } = await api("/api/programs");
-    programs.sort((a, b) => a.name.localeCompare(b.name, "de"));
+    programs.sort((a, b) => a.name.localeCompare(b.name, LANG));
     list.replaceChildren(...(programs.length
       ? programs.map(p => {
-        const details = [MODE_LABELS[p.kind] || "Einfach", `${p.blocks} ${p.blocks === 1 ? "Baustein" : "Bausteine"}`,
-          p.size == null ? "kann so nicht laufen" : sizeLabel(p.size)];
-        if (p.used_by.length) details.push(`benutzt in: ${p.used_by.join(", ")}`);
+        const details = [MODE_LABELS[p.kind] || MODE_LABELS.simple, blockCount(p.blocks),
+          p.size == null ? tr("kann so nicht laufen") : sizeLabel(p.size)];
+        if (p.used_by.length) details.push(tr("benutzt in: {names}", { names: p.used_by.join(", ") }));
         return h("li", {},
           h("span", { class: "sym", "aria-hidden": "true" }, p.symbol),
           h("span", { class: "info" }, h("b", {}, p.name), h("small", {}, details.join(" · "))),
           h("span", { class: "row-actions" },
-            h("button", { class: "btn small go", type: "button", onclick: () => loadProgram(p.name) }, "Laden"),
-            h("button", { class: "mini", type: "button", title: "Umbenennen / Symbol ändern", "aria-label": `„${p.name}“ umbenennen`, onclick: () => openRename(p) }, "✎"),
-            h("button", { class: "mini", type: "button", title: "Kopie anlegen", "aria-label": `„${p.name}“ kopieren`, onclick: () => duplicateProgram(p.name) }, "⧉"),
+            h("button", { class: "btn small go", type: "button", onclick: () => loadProgram(p.name) }, tr("Laden")),
+            h("button", { class: "mini", type: "button", title: tr("Umbenennen / Symbol ändern"), "aria-label": tr("„{name}“ umbenennen", { name: p.name }), onclick: () => openRename(p) }, "✎"),
+            h("button", { class: "mini", type: "button", title: tr("Kopie anlegen"), "aria-label": tr("„{name}“ kopieren", { name: p.name }), onclick: () => duplicateProgram(p.name) }, "⧉"),
             h("button", {
               class: "mini del", type: "button", disabled: p.used_by.length > 0,
-              title: p.used_by.length ? `Wird in „${p.used_by[0]}“ benutzt – nimm es dort zuerst heraus.` : "Löschen",
-              "aria-label": `„${p.name}“ löschen`, onclick: () => deleteProgram(p.name),
+              title: p.used_by.length ? tr("Wird in „{name}“ benutzt – nimm es dort zuerst heraus.", { name: p.used_by[0] }) : tr("Löschen"),
+              "aria-label": tr("„{name}“ löschen", { name: p.name }), onclick: () => deleteProgram(p.name),
             }, "✕")));
       })
-      : [h("li", { class: "saved-empty" }, "Noch nichts gespeichert.")]));
+      : [h("li", { class: "saved-empty" }, tr("Noch nichts gespeichert."))]));
   } catch (e) { setMsg(msg, e.message, "err"); }
 }
 
@@ -638,7 +640,7 @@ async function loadProgram(name) {
   try {
     const saved = await api("/api/programs/load", { name });
     const kind = saved.kind === "advanced" ? "advanced" : "simple";
-    if (!unsavedOk(kind, "Dein Programm ist nicht gespeichert und wird ersetzt. Trotzdem laden?")) return;
+    if (!unsavedOk(kind, tr("Dein Programm ist nicht gespeichert und wird ersetzt. Trotzdem laden?"))) return;
     if (kind === "advanced") {
       await setMode("advanced");
       await loadProfi(saved.workspace);
@@ -655,14 +657,14 @@ async function loadProgram(name) {
 async function duplicateProgram(name) {
   try {
     const res = await api("/api/programs/duplicate", { name });
-    setMsg($("#dlg-load-msg"), `Kopie „${res.name}“ angelegt.`, "ok");
+    setMsg($("#dlg-load-msg"), tr("Kopie „{name}“ angelegt.", { name: res.name }), "ok");
   } catch (e) { setMsg($("#dlg-load-msg"), e.message, "err"); }
   refreshSaved();
   refreshMine();
 }
 
 async function deleteProgram(name) {
-  if (!confirm(`„${name}“ wirklich löschen?`)) return;
+  if (!confirm(tr("„{name}“ wirklich löschen?", { name }))) return;
   try {
     await api("/api/programs/delete", { name });
     for (const m of Object.keys(current)) if (current[m].name.toLowerCase() === name.toLowerCase()) current[m] = { name: "", symbol: SYMBOLS[0] };
@@ -733,8 +735,8 @@ function renderMeter() {
   meter.classList.toggle("over", over || size == null);
   meter.style.setProperty("--fill", `${size == null ? 0 : Math.min(100, (size / maxSize) * 100)}%`);
   $(".meter-text", meter).textContent = size == null ? `⚠ ${error}`
-    : over ? `Zu groß: ${size} von ${maxSize} Bytes – das passt nicht in den Roboter!`
-    : `${Math.round((size / maxSize) * 100)} % vom Roboter-Speicher belegt (${size} von ${maxSize} Bytes)`;
+    : over ? tr("Zu groß: {size} von {max} Bytes – das passt nicht in den Roboter!", { size, max: maxSize })
+    : tr("{p} % vom Roboter-Speicher belegt ({size} von {max} Bytes)", { p: Math.round((size / maxSize) * 100), size, max: maxSize });
 }
 
 // --- simple / advanced mode, and advanced mode's two views ------------------------------------------
@@ -744,7 +746,7 @@ function loadScript(src) {
     const el = document.createElement("script");
     el.src = src;
     el.onload = resolve;
-    el.onerror = () => reject(new Error(`${src} fehlt`));
+    el.onerror = () => reject(new Error(tr("{file} fehlt", { file: src })));
     document.head.append(el);
   });
 }
@@ -758,7 +760,7 @@ function ensureAdvanced() {
       Advanced.init($("#blockly"));
       Advanced.onChange(scheduleStepCount);
     })();
-    advancedLoading.catch(e => { advancedLoading = null; showError(`Profi-Modus lässt sich nicht laden: ${e.message}`); });
+    advancedLoading.catch(e => { advancedLoading = null; showError(tr("Profi-Modus lässt sich nicht laden: {error}", { error: e.message })); });
   }
   return advancedLoading;
 }
@@ -816,8 +818,10 @@ async function convert(from, to) {
   const src = await profiEditor(from), dst = await profiEditor(to);
   const out = src.exportAst();
   if (out.loose) {          // also when nothing is converted now: the next change in the flowchart replaces them
-    showError(`${out.loose === 1 ? "Ein Stapel liegt" : `${out.loose} Stapel liegen`} lose herum (nicht unter „Wenn ▶ Start geklickt“). `
-      + "Im Ablauf gibt es dafür keinen Platz – änderst du dort etwas, sind sie weg.");
+    showError(out.loose === 1
+      ? tr("Ein Stapel liegt lose herum (nicht unter „Wenn ▶ Start geklickt“). Im Ablauf gibt es dafür keinen Platz – änderst du dort etwas, ist er weg.")
+      : tr("{n} Stapel liegen lose herum (nicht unter „Wenn ▶ Start geklickt“). Im Ablauf gibt es dafür keinen Platz – änderst du dort etwas, sind sie weg.",
+           { n: out.loose }));
   }
   const key = canonical(out.ast);
   if (synced().includes(key)) return;
@@ -839,7 +843,7 @@ async function setView(next) {
     stepCount = { size: 0, error: null, errorBlock: null };          // mark the error again, in this view
     scheduleStepCount();
   } catch (e) {
-    showError(`Umschalten hat nicht geklappt: ${e.message}`);
+    showError(tr("Umschalten hat nicht geklappt: {error}", { error: e.message }));
   } finally {
     viewBusy = false;
   }
@@ -899,10 +903,10 @@ const TESTS = {
 
 async function calTest(name) {
   const msg = $("#dlg-cal-msg");
-  if (!server.connected) { setMsg(msg, "Der Roboter ist nicht verbunden.", "err"); return; }
+  if (!server.connected) { setMsg(msg, tr("Der Roboter ist nicht verbunden."), "err"); return; }
   try {
     await api("/api/run", { blocks: TESTS[name], cal: readCal() });
-    setMsg(msg, "Läuft … schau, was der Roboter macht.");
+    setMsg(msg, tr("Läuft … schau, was der Roboter macht."));
   } catch (e) { setMsg(msg, e.message, "err"); }
 }
 
@@ -915,20 +919,20 @@ function calFit(which) {
     right: { field: "turn_right_ms", input: "#meas-right", target: 90 },
   }[which];
   const measured = Number($(pick.input).value);
-  if (!(measured > 0)) { setMsg(msg, "Trag zuerst den gemessenen Wert ein.", "err"); return; }
+  if (!(measured > 0)) { setMsg(msg, tr("Trag zuerst den gemessenen Wert ein."), "err"); return; }
   const input = f[pick.field];
   const next = Math.round(Number(input.value) * pick.target / measured);
   input.value = Math.max(Number(input.min), Math.min(Number(input.max), next));
   $(pick.input).value = "";
   refreshOutputs();
-  setMsg(msg, "Angepasst. Teste noch einmal.", "ok");
+  setMsg(msg, tr("Angepasst. Teste noch einmal."), "ok");
 }
 
 async function calSave() {
   const msg = $("#dlg-cal-msg");
   try {
     await api("/api/calibration", readCal());
-    setMsg(msg, "Gespeichert!", "ok");
+    setMsg(msg, tr("Gespeichert!"), "ok");
     await poll();
   } catch (e) { setMsg(msg, e.message, "err"); }
 }
@@ -991,8 +995,8 @@ function pollGamepad() {
   let pads = [];
   try { pads = [...navigator.getGamepads()].filter(p => p && p.connected); } catch (_) { /* not allowed here */ }
   const hint = pads.length
-    ? `🎮 ${pads[0].id.split("(")[0].trim() || "Controller"}: linker Stick fahren und lenken, A = Hupe.`
-    : "🎮 Controller anstecken und eine Taste drücken, dann: linker Stick fahren und lenken.";
+    ? tr("🎮 {pad}: linker Stick fahren und lenken, A = Hupe.", { pad: pads[0].id.split("(")[0].trim() || "Controller" })
+    : tr("🎮 Controller anstecken und eine Taste drücken, dann: linker Stick fahren und lenken.");
   if ($("#pad-hint").textContent !== hint) $("#pad-hint").textContent = hint;
   // only while this page has the focus and no dialog is open, like the keys
   const pad = document.hasFocus() && !document.querySelector("dialog[open]") ? pads[0] : null;
@@ -1009,7 +1013,7 @@ function pollGamepad() {
       stickLocked = true;
       stick = { fwd: 0, turn: 0 };
       updatePad();
-      showError("Der Roboter ist noch nicht verbunden.");
+      showError(tr("Der Roboter ist noch nicht verbunden."));
     } else {
       remoteSend();
     }
@@ -1080,7 +1084,7 @@ function setupRemote() {
 
   // browsers only report controllers to secure pages (https or localhost); elsewhere the list just stays empty
   if (navigator.getGamepads && window.isSecureContext) setInterval(pollGamepad, 50);
-  else $("#pad-hint").textContent = "🎮 Ein Controller geht nur, wenn die Seite als http://localhost:8000 geöffnet ist.";
+  else $("#pad-hint").textContent = tr("🎮 Ein Controller geht nur, wenn die Seite als http://localhost:8000 geöffnet ist.");
 }
 
 // --- wiring ---------------------------------------------------------------------------------
@@ -1100,13 +1104,13 @@ function init() {
   on("save", openSave);
   on("load", openLoad);
   $("#btn-clear").addEventListener("click", () => {
-    if (!program.length || !unsavedOk("simple", "Dein Programm ist nicht gespeichert. Trotzdem alles löschen?")) return;
+    if (!program.length || !unsavedOk("simple", tr("Dein Programm ist nicht gespeichert. Trotzdem alles löschen?"))) return;
     program = [];
     save();
     renderProgram();
   });
   $("#btn-adv-clear").addEventListener("click", () => {
-    if (!profi() || !unsavedOk("advanced", "Dein Programm ist nicht gespeichert. Trotzdem neu anfangen?")) return;
+    if (!profi() || !unsavedOk("advanced", tr("Dein Programm ist nicht gespeichert. Trotzdem neu anfangen?"))) return;
     profi().reset();
     setSynced(null);
     current.advanced = { name: "", symbol: SYMBOLS[0] };
@@ -1120,6 +1124,10 @@ function init() {
   });
   $("#status").addEventListener("click", openConnect);
   $("#btn-cal").addEventListener("click", openCal);
+  const other = LANG === "de" ? "en" : "de";
+  $("#btn-lang").textContent = other === "en" ? "English" : "Deutsch";
+  $("#btn-lang").lang = other;
+  $("#btn-lang").addEventListener("click", () => setLang(other));
 
   $("#port-refresh").addEventListener("click", refreshPorts);
   $("#connect-serial").addEventListener("click", () => connect("serial", $("#port-select").value));
@@ -1130,7 +1138,7 @@ function init() {
   $("#connect-ble").addEventListener("click", () => connect("ble", $("#ble-address").value.trim() || $("#ble-select").value));
   $("#ble-select").addEventListener("change", e => { if (e.target.value) $("#ble-address").value = e.target.value; });
   $("#disconnect").addEventListener("click", async () => {
-    try { await api("/api/disconnect", {}); setMsg($("#dlg-connect-msg"), "Getrennt."); } catch (e) { setMsg($("#dlg-connect-msg"), e.message, "err"); }
+    try { await api("/api/disconnect", {}); setMsg($("#dlg-connect-msg"), tr("Getrennt.")); } catch (e) { setMsg($("#dlg-connect-msg"), e.message, "err"); }
     poll();
   });
 

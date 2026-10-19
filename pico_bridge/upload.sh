@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 PORT="${1:-auto}"
-if [ ! -f wifi_config.py ]; then cp wifi_config.example.py wifi_config.py; echo "pico_bridge/wifi_config.py angelegt: WLAN-Name und Passwort eintragen, dann noch einmal starten."; exit 1; fi
-if grep -q 'DEIN-WLAN' wifi_config.py; then echo "Erst WLAN-Name und Passwort in pico_bridge/wifi_config.py eintragen."; exit 1; fi
+if [ ! -f wifi_config.py ]; then cp wifi_config.example.py wifi_config.py; echo "Created pico_bridge/wifi_config.py: enter your WiFi name and password, then run this again."; exit 1; fi
+if grep -qE 'YOUR-WIFI|DEIN-WLAN' wifi_config.py; then echo "Enter your WiFi name and password in pico_bridge/wifi_config.py first."; exit 1; fi
 uvx mpremote connect "$PORT" fs cp wifi_config.py :wifi_config.py + fs cp main.py :main.py + reset
-echo "Hochgeladen. Die LED blinkt schnell beim Verbinden, langsam sobald das WLAN steht."
+echo "Uploaded. The LED blinks fast while joining the WiFi, slowly once it is connected."

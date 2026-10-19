@@ -18,83 +18,83 @@ window.Advanced = (() => {
 
   const BLOCKS = [
     // --- Bewegung
-    { type: "mbot_move", message0: "fahre %1 %2 Schritte", ...stmt, colour: COLORS.move,
-      args0: [{ type: "field_dropdown", name: "DIR", options: [["vorwärts", "forward"], ["rückwärts", "backward"]] },
+    { type: "mbot_move", message0: tr("fahre %1 %2 Schritte"), ...stmt, colour: COLORS.move,
+      args0: [{ type: "field_dropdown", name: "DIR", options: [[tr("vorwärts"), "forward"], [tr("rückwärts"), "backward"]] },
               { type: "field_number", name: "STEPS", value: 1, min: 0.1, max: 50 }],
-      tooltip: "Fährt eine feste Strecke (Schritte aus der Kalibrierung) und hält dann an." },
-    { type: "mbot_turn", message0: "drehe %1 um %2 °", ...stmt, colour: COLORS.move,
-      args0: [{ type: "field_dropdown", name: "DIR", options: [["links", "left"], ["rechts", "right"]] },
+      tooltip: tr("Fährt eine feste Strecke (Schritte aus der Kalibrierung) und hält dann an.") },
+    { type: "mbot_turn", message0: tr("drehe %1 um %2 °"), ...stmt, colour: COLORS.move,
+      args0: [{ type: "field_dropdown", name: "DIR", options: [[tr("links"), "left"], [tr("rechts"), "right"]] },
               { type: "field_number", name: "DEG", value: 90, min: 5, max: 720 }],
-      tooltip: "Dreht sich auf der Stelle (Winkel aus der Kalibrierung) und hält dann an." },
-    { type: "mbot_drive", message0: "fahre %1 mit %2 %%", ...stmt, colour: COLORS.move, inputsInline: true,
-      args0: [{ type: "field_dropdown", name: "DIR", options: [["vorwärts", "forward"], ["rückwärts", "backward"],
-                                                                ["links herum", "left"], ["rechts herum", "right"]] },
+      tooltip: tr("Dreht sich auf der Stelle (Winkel aus der Kalibrierung) und hält dann an.") },
+    { type: "mbot_drive", message0: tr("fahre %1 mit %2 %%"), ...stmt, colour: COLORS.move, inputsInline: true,
+      args0: [{ type: "field_dropdown", name: "DIR", options: [[tr("vorwärts"), "forward"], [tr("rückwärts"), "backward"],
+                                                                [tr("links herum"), "left"], [tr("rechts herum"), "right"]] },
               { type: "input_value", name: "POWER", check: "Number" }],
-      tooltip: "Losfahren und weiterfahren, bis ein anderer Baustein etwas anderes sagt (z. B. „halte an“)." },
-    { type: "mbot_motors", message0: "Motoren: links %1 %% rechts %2 %%", ...stmt, colour: COLORS.move, inputsInline: true,
+      tooltip: tr("Losfahren und weiterfahren, bis ein anderer Baustein etwas anderes sagt (z. B. „halte an“).") },
+    { type: "mbot_motors", message0: tr("Motoren: links %1 %% rechts %2 %%"), ...stmt, colour: COLORS.move, inputsInline: true,
       args0: [{ type: "input_value", name: "LEFT", check: "Number" }, { type: "input_value", name: "RIGHT", check: "Number" }],
-      tooltip: "Jedes Rad einzeln: -100 (rückwärts) bis 100 (vorwärts). Unter ca. 30 drehen die Räder nicht." },
-    { type: "mbot_stop", message0: "halte an", ...stmt, colour: COLORS.move, tooltip: "Beide Motoren aus." },
+      tooltip: tr("Jedes Rad einzeln: -100 (rückwärts) bis 100 (vorwärts). Unter ca. 30 drehen die Räder nicht.") },
+    { type: "mbot_stop", message0: tr("halte an"), ...stmt, colour: COLORS.move, tooltip: tr("Beide Motoren aus.") },
     // --- Klang
-    { type: "mbot_beep", message0: "spiele Ton %1 Hz für %2 Sek.", ...stmt, colour: COLORS.sound, inputsInline: true,
+    { type: "mbot_beep", message0: tr("spiele Ton %1 Hz für %2 Sek."), ...stmt, colour: COLORS.sound, inputsInline: true,
       args0: [{ type: "input_value", name: "HZ", check: "Number" }, { type: "input_value", name: "SEC", check: "Number" }],
-      tooltip: "Spielt den Ton und wartet, bis er fertig ist." },
-    { type: "mbot_beep_start", message0: "starte Ton %1 Hz für %2 Sek.", ...stmt, colour: COLORS.sound, inputsInline: true,
+      tooltip: tr("Spielt den Ton und wartet, bis er fertig ist.") },
+    { type: "mbot_beep_start", message0: tr("starte Ton %1 Hz für %2 Sek."), ...stmt, colour: COLORS.sound, inputsInline: true,
       args0: [{ type: "input_value", name: "HZ", check: "Number" }, { type: "input_value", name: "SEC", check: "Number" }],
-      tooltip: "Der Ton läuft, während das Programm schon weitermacht – z. B. beim Fahren." },
+      tooltip: tr("Der Ton läuft, während das Programm schon weitermacht – z. B. beim Fahren.") },
     // --- Sensoren
-    { type: "mbot_distance", message0: "Abstand (cm)", output: "Number", colour: COLORS.sensor,
-      tooltip: "Ultraschall-Sensor: 1 bis 400 cm. 400 heißt: nichts in Reichweite." },
-    { type: "mbot_line", message0: "Linie %1 schwarz?", output: "Boolean", colour: COLORS.sensor,
-      args0: [{ type: "field_dropdown", name: "SIDE", options: [["links", "left"], ["rechts", "right"]] }],
-      tooltip: "Linienfolger-Sensor: ist unter dem linken / rechten Auge die schwarze Linie?" },
-    { type: "mbot_light", message0: "Helligkeit", output: "Number", colour: COLORS.sensor,
-      tooltip: "Lichtsensor auf der Platine: 0 (dunkel) bis 1023 (hell)." },
-    { type: "mbot_button", message0: "Taste gedrückt?", output: "Boolean", colour: COLORS.sensor,
-      tooltip: "Der kleine Knopf auf der Platine." },
-    { type: "mbot_timer", message0: "Stoppuhr (ms)", output: "Number", colour: COLORS.sensor,
-      tooltip: "Millisekunden seit dem Start (oder seit „Stoppuhr auf 0“). 1000 ms = 1 Sekunde." },
-    { type: "mbot_timer_reset", message0: "Stoppuhr auf 0", ...stmt, colour: COLORS.sensor },
+    { type: "mbot_distance", message0: tr("Abstand (cm)"), output: "Number", colour: COLORS.sensor,
+      tooltip: tr("Ultraschall-Sensor: 1 bis 400 cm. 400 heißt: nichts in Reichweite.") },
+    { type: "mbot_line", message0: tr("Linie %1 schwarz?"), output: "Boolean", colour: COLORS.sensor,
+      args0: [{ type: "field_dropdown", name: "SIDE", options: [[tr("links"), "left"], [tr("rechts"), "right"]] }],
+      tooltip: tr("Linienfolger-Sensor: ist unter dem linken / rechten Auge die schwarze Linie?") },
+    { type: "mbot_light", message0: tr("Helligkeit"), output: "Number", colour: COLORS.sensor,
+      tooltip: tr("Lichtsensor auf der Platine: 0 (dunkel) bis 1023 (hell).") },
+    { type: "mbot_button", message0: tr("Taste gedrückt?"), output: "Boolean", colour: COLORS.sensor,
+      tooltip: tr("Der kleine Knopf auf der Platine.") },
+    { type: "mbot_timer", message0: tr("Stoppuhr (ms)"), output: "Number", colour: COLORS.sensor,
+      tooltip: tr("Millisekunden seit dem Start (oder seit „Stoppuhr auf 0“). 1000 ms = 1 Sekunde.") },
+    { type: "mbot_timer_reset", message0: tr("Stoppuhr auf 0"), ...stmt, colour: COLORS.sensor },
     // --- Steuerung
-    { type: "mbot_start", message0: "Wenn ▶ Start geklickt", nextStatement: null, colour: COLORS.control,
-      extensions: ["mbot_hat"], tooltip: "Hier fängt das Programm an. Nur was hier dranhängt, läuft auf dem Roboter." },
-    { type: "mbot_wait", message0: "warte %1 Sek.", ...stmt, colour: COLORS.control, inputsInline: true,
+    { type: "mbot_start", message0: tr("Wenn ▶ Start geklickt"), nextStatement: null, colour: COLORS.control,
+      extensions: ["mbot_hat"], tooltip: tr("Hier fängt das Programm an. Nur was hier dranhängt, läuft auf dem Roboter.") },
+    { type: "mbot_wait", message0: tr("warte %1 Sek."), ...stmt, colour: COLORS.control, inputsInline: true,
       args0: [{ type: "input_value", name: "SEC", check: "Number" }] },
-    { type: "mbot_repeat", message0: "wiederhole %1 mal %2 %3", ...stmt, colour: COLORS.control,
+    { type: "mbot_repeat", message0: tr("wiederhole %1 mal %2 %3"), ...stmt, colour: COLORS.control,
       args0: [{ type: "input_value", name: "TIMES", check: "Number" }, { type: "input_dummy" },
               { type: "input_statement", name: "DO" }] },
-    { type: "mbot_forever", message0: "wiederhole fortlaufend %1 %2", previousStatement: null, colour: COLORS.control,
+    { type: "mbot_forever", message0: tr("wiederhole fortlaufend %1 %2"), previousStatement: null, colour: COLORS.control,
       args0: [{ type: "input_dummy" }, { type: "input_statement", name: "DO" }] },
-    { type: "mbot_if", message0: "falls %1 dann %2 %3", ...stmt, colour: COLORS.control,
+    { type: "mbot_if", message0: tr("falls %1 dann %2 %3"), ...stmt, colour: COLORS.control,
       args0: [{ type: "input_value", name: "COND", check: "Boolean" }, { type: "input_dummy" },
               { type: "input_statement", name: "THEN" }] },
-    { type: "mbot_if_else", message0: "falls %1 dann %2 %3", message1: "sonst %1 %2", ...stmt, colour: COLORS.control,
+    { type: "mbot_if_else", message0: tr("falls %1 dann %2 %3"), message1: tr("sonst %1 %2"), ...stmt, colour: COLORS.control,
       args0: [{ type: "input_value", name: "COND", check: "Boolean" }, { type: "input_dummy" },
               { type: "input_statement", name: "THEN" }],
       args1: [{ type: "input_dummy" }, { type: "input_statement", name: "ELSE" }] },
-    { type: "mbot_wait_until", message0: "warte bis %1", ...stmt, colour: COLORS.control,
+    { type: "mbot_wait_until", message0: tr("warte bis %1"), ...stmt, colour: COLORS.control,
       args0: [{ type: "input_value", name: "COND", check: "Boolean" }] },
-    { type: "mbot_repeat_until", message0: "wiederhole bis %1 %2 %3", ...stmt, colour: COLORS.control,
+    { type: "mbot_repeat_until", message0: tr("wiederhole bis %1 %2 %3"), ...stmt, colour: COLORS.control,
       args0: [{ type: "input_value", name: "COND", check: "Boolean" }, { type: "input_dummy" },
               { type: "input_statement", name: "DO" }] },
-    { type: "mbot_end", message0: "beende Programm", previousStatement: null, colour: COLORS.control },
+    { type: "mbot_end", message0: tr("beende Programm"), previousStatement: null, colour: COLORS.control },
     // --- Rechnen
     { type: "mbot_arith", message0: "%1 %2 %3", output: "Number", colour: COLORS.math, inputsInline: true,
       args0: [{ type: "input_value", name: "A", check: "Number" },
-              { type: "field_dropdown", name: "FN", options: [["+", "+"], ["−", "-"], ["×", "*"], ["÷", "/"], ["Rest", "%"]] },
+              { type: "field_dropdown", name: "FN", options: [["+", "+"], ["−", "-"], ["×", "*"], ["÷", "/"], [tr("Rest"), "%"]] },
               { type: "input_value", name: "B", check: "Number" }],
-      tooltip: "Der Roboter rechnet mit ganzen Zahlen: 7 ÷ 2 = 3." },
+      tooltip: tr("Der Roboter rechnet mit ganzen Zahlen: 7 ÷ 2 = 3.") },
     { type: "mbot_compare", message0: "%1 %2 %3", output: "Boolean", colour: COLORS.math, inputsInline: true,
       args0: [{ type: "input_value", name: "A", check: "Number" },
               { type: "field_dropdown", name: "FN", options: [["<", "<"], [">", ">"], ["=", "="], ["≤", "<="], ["≥", ">="], ["≠", "!="]] },
               { type: "input_value", name: "B", check: "Number" }] },
     { type: "mbot_logic", message0: "%1 %2 %3", output: "Boolean", colour: COLORS.math, inputsInline: true,
       args0: [{ type: "input_value", name: "A", check: "Boolean" },
-              { type: "field_dropdown", name: "FN", options: [["und", "and"], ["oder", "or"]] },
+              { type: "field_dropdown", name: "FN", options: [[tr("und"), "and"], [tr("oder"), "or"]] },
               { type: "input_value", name: "B", check: "Boolean" }] },
-    { type: "mbot_not", message0: "nicht %1", output: "Boolean", colour: COLORS.math,
+    { type: "mbot_not", message0: tr("nicht %1"), output: "Boolean", colour: COLORS.math,
       args0: [{ type: "input_value", name: "A", check: "Boolean" }] },
-    { type: "mbot_random", message0: "Zufallszahl von %1 bis %2", output: "Number", colour: COLORS.math, inputsInline: true,
+    { type: "mbot_random", message0: tr("Zufallszahl von %1 bis %2"), output: "Number", colour: COLORS.math, inputsInline: true,
       args0: [{ type: "input_value", name: "LO", check: "Number" }, { type: "input_value", name: "HI", check: "Number" }] },
   ];
 
@@ -102,21 +102,21 @@ window.Advanced = (() => {
   const TOOLBOX = {
     kind: "categoryToolbox",
     contents: [
-      { kind: "category", name: "Bewegung", colour: COLORS.move, contents: [
+      { kind: "category", name: tr("Bewegung"), colour: COLORS.move, contents: [
         b("mbot_move"), b("mbot_turn"), b("mbot_drive", num("POWER", 50)),
         b("mbot_motors", { ...num("LEFT", 50), ...num("RIGHT", 50) }), b("mbot_stop")] },
-      { kind: "category", name: "Klang", colour: COLORS.sound, contents: [
+      { kind: "category", name: tr("Klang"), colour: COLORS.sound, contents: [
         b("mbot_beep", { ...num("HZ", 880), ...num("SEC", 0.25) }), b("mbot_beep_start", { ...num("HZ", 440), ...num("SEC", 0.5) })] },
-      { kind: "category", name: "Sensoren", colour: COLORS.sensor, contents: [
+      { kind: "category", name: tr("Sensoren"), colour: COLORS.sensor, contents: [
         b("mbot_distance"), b("mbot_line"), b("mbot_light"), b("mbot_button"), b("mbot_timer"), b("mbot_timer_reset")] },
-      { kind: "category", name: "Steuerung", colour: COLORS.control, contents: [
+      { kind: "category", name: tr("Steuerung"), colour: COLORS.control, contents: [
         b("mbot_start"), b("mbot_wait", num("SEC", 1)), b("mbot_repeat", num("TIMES", 4)), b("mbot_forever"),
         b("mbot_if"), b("mbot_if_else"), b("mbot_wait_until"), b("mbot_repeat_until"), b("mbot_end")] },
-      { kind: "category", name: "Rechnen", colour: COLORS.math, contents: [
+      { kind: "category", name: tr("Rechnen"), colour: COLORS.math, contents: [
         b("mbot_arith", { ...num("A", 0), ...num("B", 0) }), b("mbot_compare", { ...num("A", 0), ...num("B", 50) }),
         b("mbot_logic"), b("mbot_not"), b("mbot_random", { ...num("LO", 1), ...num("HI", 10) }), b("math_number")] },
-      { kind: "category", name: "Variablen", colour: COLORS.vars, custom: "VARIABLE" },
-      { kind: "category", name: "Meine Blöcke", colour: COLORS.mine, custom: "MBOT_FUNCS" },
+      { kind: "category", name: tr("Variablen"), colour: COLORS.vars, custom: "VARIABLE" },
+      { kind: "category", name: tr("Meine Blöcke"), colour: COLORS.mine, custom: "MBOT_FUNCS" },
     ],
   };
 
@@ -148,9 +148,9 @@ window.Advanced = (() => {
   function init(container) {
     if (ws) return;
     Blockly.Extensions.register("mbot_hat", function () { this.hat = "cap"; });
-    Object.assign(Blockly.Msg, {        // Blockly's German reads "um etwas tun"; say it the way Scratch does
-      PROCEDURES_DEFNORETURN_TITLE: "Definiere", PROCEDURES_DEFNORETURN_PROCEDURE: "mein Block",
-      PROCEDURES_BEFORE_PARAMS: "mit:", PROCEDURES_MUTATORCONTAINER_TITLE: "Eingaben", PROCEDURES_MUTATORARG_TITLE: "Eingabe:",
+    Object.assign(Blockly.Msg, {        // Blockly says "um etwas tun" / "to do something"; say it the way Scratch does
+      PROCEDURES_DEFNORETURN_TITLE: tr("Definiere"), PROCEDURES_DEFNORETURN_PROCEDURE: tr("mein Block"),
+      PROCEDURES_BEFORE_PARAMS: tr("mit:"), PROCEDURES_MUTATORCONTAINER_TITLE: tr("Eingaben"), PROCEDURES_MUTATORARG_TITLE: tr("Eingabe:"),
     });
     Blockly.defineBlocksWithJsonArray(BLOCKS);
     registerContinuousToolbox();       // vendor/blockly/continuous-toolbox.js: the palette stays open, like Scratch
@@ -174,7 +174,7 @@ window.Advanced = (() => {
     // "Meine Blöcke": a new definition, then a call block for every block defined so far (Blockly's own
     // procedure blocks; the ones with a return value are left out)
     ws.registerToolboxCategoryCallback("MBOT_FUNCS", w => [
-      { kind: "label", text: "Neuen Block bauen (Eingaben übers Zahnrad):" },
+      { kind: "label", text: tr("Neuen Block bauen (Eingaben übers Zahnrad):") },
       { kind: "block", type: "procedures_defnoreturn" },
       ...Blockly.Procedures.allProcedures(w)[0].map(([name, params]) =>
         ({ kind: "block", type: "procedures_callnoreturn", extraState: { name, params } })),
@@ -278,9 +278,9 @@ window.Advanced = (() => {
   // Only the stack under "Wenn ▶ Start geklickt" runs (the first one, if there are several).
   function toAst() {
     const hat = ws.getTopBlocks(true).find(blk => blk.type === "mbot_start" && blk.isEnabled());
-    if (!hat) throw new Error("Es fehlt der Baustein „Wenn ▶ Start geklickt“ (unter Steuerung).");
+    if (!hat) throw new Error(tr("Es fehlt der Baustein „Wenn ▶ Start geklickt“ (unter Steuerung)."));
     const body = stmts(hat.getNextBlock());
-    if (!body.length) throw new Error("Häng Bausteine unter „Wenn ▶ Start geklickt“.");
+    if (!body.length) throw new Error(tr("Häng Bausteine unter „Wenn ▶ Start geklickt“."));
     return { body, functions: functions() };
   }
 

@@ -8,4 +8,4 @@ cd "$(dirname "$0")"
 PORT="${1:-/dev/ttyUSB0}"
 tools/acli compile --fqbn arduino:avr:uno firmware/mbot_vm
 tools/acli upload --fqbn arduino:avr:uno -p "$PORT" firmware/mbot_vm
-echo "Fertig: firmware/mbot_vm ist auf dem Roboter (Upload erfolgreich). Er piept kurz beim Start."
+echo "Done: firmware/mbot_vm is on the robot. It beeps once when it starts."

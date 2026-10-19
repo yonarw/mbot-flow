@@ -37,6 +37,7 @@ Values are integers on the robot; fractional numbers are rounded (except seconds
 
 import math
 
+from i18n import Msg
 from bytecode import (CALL_MAX, Assembler, Label, MOVE_KEEP_DRIVING, PROG_MAX, SENSORS, VARS_MAX, cdiv,
                       disassemble, verify)
 
@@ -54,20 +55,22 @@ SENSOR_EXPR = {"distance", "light", "button", "timer", "line_left", "line_right"
 
 
 class CompileError(Exception):
-    """Shown to the user as is (German). .block: id of the block it is about, if known."""
+    """Shown to the user (.msg, a Msg: German as str(), any language via .msg.render(lang)). .block: id of the
+    block it is about, if known."""
 
-    def __init__(self, message, block=None):
-        super().__init__(message)
+    def __init__(self, message, block=None, **args):
+        self.msg = message if isinstance(message, Msg) else Msg(message, **args)
+        super().__init__(self.msg)
         self.block = block
 
 
-def _num(value, what="Zahl"):
+def _num(value):
     try:
         v = float(value)
     except (TypeError, ValueError):
-        raise CompileError(f"Ungültige {what}.")
+        raise CompileError("Ungültige Zahl.")
     if not math.isfinite(v):
-        raise CompileError(f"Ungültige {what}.")
+        raise CompileError("Ungültige Zahl.")
     return v
 
 
@@ -120,7 +123,7 @@ class Compiler:
     def function(self, name):
         """The label of a function, compiled later (once, however often it is called)."""
         if name not in self.functions:
-            raise CompileError(f"Den Block „{name}“ gibt es nicht (mehr).")
+            raise CompileError("Den Block „{name}“ gibt es nicht (mehr).", name=name)
         self.call_graph.setdefault(self.fn, set()).add(name)
         if name not in self.fn_labels:
             self.fn_labels[name] = Label(f"fn:{name}")
@@ -147,7 +150,7 @@ class Compiler:
             if a is None or b is None:
                 return None
             if e.get("fn") not in BIN_OPS:
-                raise CompileError(f"Unbekannte Rechenart: {e.get('fn')}")
+                raise CompileError("Unbekannte Rechenart: {fn}", fn=e.get("fn"))
             if e.get("fn") in ("+", "-", "*") and (a != int(a) or b != int(b)):
                 return {"+": a + b, "-": a - b, "*": a * b}[e["fn"]]    # keep 0.5 * 2 exact
             return float(_fold(e["fn"], a, b))
@@ -166,7 +169,7 @@ class Compiler:
         elif op == "sensor":
             name = e.get("name")
             if name not in SENSOR_EXPR:
-                raise CompileError(f"Unbekannter Sensor: {name}")
+                raise CompileError("Unbekannter Sensor: {name}", name=name)
             if name in ("line_left", "line_right"):        # 1 = over black (the raw sensor says 0 there)
                 self.asm.emit("SENS", SENSORS[LINE_LEFT if name == "line_left" else LINE_RIGHT])
                 self.asm.emit("NOT")
@@ -175,7 +178,7 @@ class Compiler:
         elif op == "bin":
             fn = e.get("fn")
             if fn not in BIN_OPS:
-                raise CompileError(f"Unbekannte Rechenart: {fn}")
+                raise CompileError("Unbekannte Rechenart: {fn}", fn=fn)
             self.expr(e.get("a"), depth + 1)
             self.expr(e.get("b"), depth + 1)
             self.asm.emit(BIN_OPS[fn])
@@ -187,7 +190,7 @@ class Compiler:
             self.expr(e.get("hi"), depth + 1)
             self.asm.emit("RAND")
         else:
-            raise CompileError(f"Unbekannter Baustein: {op}")
+            raise CompileError("Unbekannter Baustein: {kind}", kind=op)
 
     def scaled(self, e, factor, divisor=1):
         """expr * factor / divisor, folded when constant (used for % -> PWM and s -> ms)."""
@@ -248,7 +251,7 @@ class Compiler:
             raise CompileError("Zu tief verschachtelt.")
         self.count += 1
         if self.count > MAX_STATEMENTS:
-            raise CompileError(f"Zu viele Bausteine (höchstens {MAX_STATEMENTS}).")
+            raise CompileError("Zu viele Bausteine (höchstens {n}).", n=MAX_STATEMENTS)
         if not isinstance(s, dict):
             raise CompileError("Ungültiges Programm.")
         asm, cal, kind = self.asm, self.cal, s.get("do")
@@ -280,7 +283,7 @@ class Compiler:
             elif d == "right":
                 self.motors((p, 25500), (p, -25500))
             else:
-                raise CompileError(f"Unbekannte Richtung: {d}")
+                raise CompileError("Unbekannte Richtung: {dir}", dir=d)
         elif kind == "motors":
             self.motors((s.get("left", 0), 25500), (s.get("right", 0), 25500))
         elif kind == "stop":
@@ -383,7 +386,7 @@ class Compiler:
             label = self.function(name)
             params, args = self.functions[name]["params"], s.get("args") or []
             if len(args) != len(params):
-                raise CompileError(f"„{name}“ braucht {len(params)} Eingabe(n).")
+                raise CompileError("„{name}“ braucht {n} Eingabe(n).", name=name, n=len(params))
             for a in args:
                 self.expr(a)
             for p in reversed(params):
@@ -394,7 +397,7 @@ class Compiler:
         elif kind == "end":
             asm.emit("HALT")
         else:
-            raise CompileError(f"Unbekannter Baustein: {kind}")
+            raise CompileError("Unbekannter Baustein: {kind}", kind=kind)
         asm.owner = outer
 
     def compile_functions(self):
@@ -418,13 +421,13 @@ class Compiler:
         """No recursion (it would never end), and not deeper than the robot's return stack."""
         def depth(name, path):
             if name in path:
-                raise CompileError(f"„{name}“ benutzt sich selbst – dann würde es nie fertig.",
-                                   self.functions[name].get("id"))
+                raise CompileError("„{name}“ benutzt sich selbst – dann würde es nie fertig.", name=name,
+                                   block=self.functions[name].get("id"))
             callees = self.call_graph.get(name, set())
             return max((1 + depth(c, path + (name,)) for c in callees), default=0)
         deepest = max((1 + depth(c, ()) for c in self.call_graph[None]), default=0)
         if deepest > CALL_MAX:
-            raise CompileError(f"Zu viele Blöcke ineinander ({deepest}, höchstens {CALL_MAX}).")
+            raise CompileError("Zu viele Blöcke ineinander ({n}, höchstens {max}).", n=deepest, max=CALL_MAX)
 
     def finish(self):
         self.asm.owner = None
@@ -437,13 +440,13 @@ class Compiler:
             item[1] = [slot_of.get(a, a) if isinstance(a, tuple) else a for a in item[1]]
         nvars = base + len(self.hidden)
         if nvars > VARS_MAX:
-            raise CompileError(f"Zu viele Variablen, Eingaben und verschachtelte Wiederholungen (höchstens {VARS_MAX}).")
+            raise CompileError("Zu viele Variablen, Eingaben und verschachtelte Wiederholungen (höchstens {n}).", n=VARS_MAX)
         code, owners = self.asm.assemble()
         if len(code) > PROG_MAX:
-            raise CompileError(f"Das Programm ist zu groß für den Roboter ({len(code)} von {PROG_MAX} Bytes).")
+            raise CompileError("Das Programm ist zu groß für den Roboter ({size} von {max} Bytes).", size=len(code), max=PROG_MAX)
         bad = verify(code, nvars)
         if bad is not None:
-            raise CompileError(f"Interner Fehler im Übersetzer (Befehl {bad}).")
+            raise CompileError("Interner Fehler im Übersetzer (Befehl {pc}).", pc=bad)
         return {"code": code, "nvars": nvars, "owners": owners,
                 "vars": [n for n, _ in sorted(self.vars.items(), key=lambda kv: kv[1])],
                 "durations": self.durations(), "size": len(code), "max_size": PROG_MAX}
