@@ -18,13 +18,13 @@ window.Advanced = (() => {
 
   const BLOCKS = [
     // --- Bewegung
-    { type: "mbot_move", message0: tr("fahre %1 %2 Schritte"), ...stmt, colour: COLORS.move,
+    { type: "mbot_move", message0: tr("fahre %1 %2 Schritte"), ...stmt, colour: COLORS.move, inputsInline: true,
       args0: [{ type: "field_dropdown", name: "DIR", options: [[tr("vorwärts"), "forward"], [tr("rückwärts"), "backward"]] },
-              { type: "field_number", name: "STEPS", value: 1, min: 0.1, max: 50 }],
+              { type: "input_value", name: "STEPS", check: "Number" }],
       tooltip: tr("Fährt eine feste Strecke (Schritte aus der Kalibrierung) und hält dann an.") },
-    { type: "mbot_turn", message0: tr("drehe %1 um %2 °"), ...stmt, colour: COLORS.move,
+    { type: "mbot_turn", message0: tr("drehe %1 um %2 °"), ...stmt, colour: COLORS.move, inputsInline: true,
       args0: [{ type: "field_dropdown", name: "DIR", options: [[tr("links"), "left"], [tr("rechts"), "right"]] },
-              { type: "field_number", name: "DEG", value: 90, min: 5, max: 720 }],
+              { type: "input_value", name: "DEG", check: "Number" }],
       tooltip: tr("Dreht sich auf der Stelle (Winkel aus der Kalibrierung) und hält dann an.") },
     { type: "mbot_drive", message0: tr("fahre %1 mit %2 %%"), ...stmt, colour: COLORS.move, inputsInline: true,
       args0: [{ type: "field_dropdown", name: "DIR", options: [[tr("vorwärts"), "forward"], [tr("rückwärts"), "backward"],
@@ -103,7 +103,7 @@ window.Advanced = (() => {
     kind: "categoryToolbox",
     contents: [
       { kind: "category", name: tr("Bewegung"), colour: COLORS.move, contents: [
-        b("mbot_move"), b("mbot_turn"), b("mbot_drive", num("POWER", 50)),
+        b("mbot_move", num("STEPS", 1)), b("mbot_turn", num("DEG", 90)), b("mbot_drive", num("POWER", 50)),
         b("mbot_motors", { ...num("LEFT", 50), ...num("RIGHT", 50) }), b("mbot_stop")] },
       { kind: "category", name: tr("Klang"), colour: COLORS.sound, contents: [
         b("mbot_beep", { ...num("HZ", 880), ...num("SEC", 0.25) }), b("mbot_beep_start", { ...num("HZ", 440), ...num("SEC", 0.5) })] },
@@ -183,7 +183,7 @@ window.Advanced = (() => {
     let restored = false;
     try {
       const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-      if (saved) { Blockly.serialization.workspaces.load(saved, ws); restored = true; }
+      if (saved) { Blockly.serialization.workspaces.load(upgrade(saved), ws); restored = true; }
     } catch (_) { /* broken or no storage: start fresh */ }
     if (!restored || !ws.getTopBlocks(false).length) reset();
     let timer = null;
@@ -207,8 +207,27 @@ window.Advanced = (() => {
 
   const state = () => Blockly.serialization.workspaces.save(ws);
   function load(saved) {
-    Blockly.serialization.workspaces.load(saved, ws);
+    Blockly.serialization.workspaces.load(upgrade(saved), ws);
     if (!ws.getTopBlocks(false).length) reset();
+  }
+
+  // Workspaces saved when steps and degrees were number fields: the number becomes the input's shadow (Blockly
+  // would drop the unknown field and leave the input empty).
+  const WAS_FIELD = { mbot_move: "STEPS", mbot_turn: "DEG" };
+  function upgrade(saved) {
+    const visit = blk => {
+      if (!blk || typeof blk !== "object") return;
+      const name = WAS_FIELD[blk.type];
+      if (name && blk.fields && name in blk.fields) {
+        const { [name]: value, ...fields } = blk.fields;
+        blk.fields = fields;
+        blk.inputs = { ...blk.inputs, ...num(name, Number(value)) };
+      }
+      for (const input of Object.values(blk.inputs || {})) { visit(input.block); visit(input.shadow); }
+      if (blk.next) visit(blk.next.block);
+    };
+    ((saved && saved.blocks && saved.blocks.blocks) || []).forEach(visit);
+    return saved;
   }
 
   // --- workspace -> syntax tree -------------------------------------------------------------
@@ -251,8 +270,8 @@ window.Advanced = (() => {
     const input = name => expr(blk.getInputTargetBlock(name));
     const body = name => stmts(blk.getInputTargetBlock(name));
     switch (blk.type) {
-      case "mbot_move": return { do: "move", dir: blk.getFieldValue("DIR"), steps: Number(blk.getFieldValue("STEPS")) };
-      case "mbot_turn": return { do: "turn", dir: blk.getFieldValue("DIR"), deg: Number(blk.getFieldValue("DEG")) };
+      case "mbot_move": return { do: "move", dir: blk.getFieldValue("DIR"), steps: input("STEPS") };
+      case "mbot_turn": return { do: "turn", dir: blk.getFieldValue("DIR"), deg: input("DEG") };
       case "mbot_drive": return { do: "drive", dir: blk.getFieldValue("DIR"), power: input("POWER") };
       case "mbot_motors": return { do: "motors", left: input("LEFT"), right: input("RIGHT") };
       case "mbot_stop": return { do: "stop" };
@@ -375,8 +394,8 @@ window.Advanced = (() => {
       const b = (type, parts = {}) => ({ type, id: s.id, ...parts });
       const body = arr => { const first = chain(arr); return first ? { block: first } : undefined; };
       switch (s.do) {
-        case "move": return b("mbot_move", { fields: { DIR: s.dir, STEPS: s.steps } });
-        case "turn": return b("mbot_turn", { fields: { DIR: s.dir, DEG: s.deg } });
+        case "move": return b("mbot_move", { fields: { DIR: s.dir }, inputs: clean({ STEPS: numIn(s.steps) }) });
+        case "turn": return b("mbot_turn", { fields: { DIR: s.dir }, inputs: clean({ DEG: numIn(s.deg) }) });
         case "drive": return b("mbot_drive", { fields: { DIR: s.dir }, inputs: clean({ POWER: numIn(s.power) }) });
         case "motors": return b("mbot_motors", { inputs: clean({ LEFT: numIn(s.left), RIGHT: numIn(s.right) }) });
         case "stop": return b("mbot_stop");

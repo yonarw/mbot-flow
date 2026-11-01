@@ -1086,8 +1086,17 @@
                                 "type": "mbot_turn",
                                 "id": "~L+6g*Vw,5m{O8X9gB`j",
                                 "fields": {
-                                  "DIR": "right",
-                                  "DEG": 90
+                                  "DIR": "right"
+                                },
+                                "inputs": {
+                                  "DEG": {
+                                    "shadow": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 90
+                                      }
+                                    }
+                                  }
                                 }
                               }
                             }

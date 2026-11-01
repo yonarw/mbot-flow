@@ -258,6 +258,8 @@ body:not(.view-flow) .flow-area, body.view-flow .blockly-area { display: none; }
 .f-node .f-chip.f-random { background: #59C059; color: #fff; display: inline-flex; align-items: center; gap: 0.25rem;
                            padding: 0.15rem 0.35rem; cursor: default; box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.12); }
 .f-node .f-random .f-num { width: 2.9rem; min-height: 1.6rem; }
+.f-node .f-chip.f-calc { background: #59C059; color: #fff; display: inline-flex; align-items: center; gap: 0.2rem;
+                         padding: 0.15rem 0.3rem; cursor: default; box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.12); }
 .f-dice { border: 0; background: transparent; cursor: pointer; font-size: 1rem; padding: 0 0.1rem; }
 /* while a value is dragged: every slot it can go into, the one it would go into */
 body.f-dragging-value .f-slot.target { outline: 3px dashed rgb(255 255 255 / 0.95); outline-offset: 2px; border-radius: 10px; }
@@ -318,6 +320,7 @@ body.f-dragging { user-select: none; cursor: grabbing; }
 .f-pop-btn.ok { background: var(--go); border-color: var(--go); color: #fff; }
 .f-pop-btn.var { border-color: #FF8C1A; }
 .f-pop-btn.sensor { border-color: #5CB1D6; }
+.f-pop-btn.math { border-color: #59C059; }
 .f-pop-btn.ghost { border-style: dashed; }
 
 /* narrow: the palette above the chart, a third of the height, scrolling */

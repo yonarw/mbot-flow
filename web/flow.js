@@ -10,7 +10,7 @@
 // Statements are the compiler's ({ id, do, … }); values and conditions have their own small shapes, so a
 // condition is picked from a menu ("Linie links schwarz?") instead of being built from nested blocks:
 //     value: { k: "num", n } | { k: "var", name } | { k: "sensor", name: distance|light|timer } | { k: "random", lo, hi }
-//            (the stopwatch in seconds; the robot counts milliseconds)
+//            | { k: "calc", a: value, fn: + - * / %, b: value }   (the stopwatch in seconds; the robot counts milliseconds)
 //     cond:  { k: "line", side: left|right|both, black } | { k: "button", pressed } | { k: "cmp", a: value, fn, v: value }
 // Values are also blocks of their own in the palette ("Abstand", a variable, "Zufall"), dragged into a value slot
 // (a number field, either side of a comparison) or onto a question.
@@ -49,6 +49,7 @@ window.Flow = (() => {
   const TERMINAL = new Set(["forever", "end"]);          // nothing can come after these
   const num = n => ({ k: "num", n });
   const CMP = { "<": "<", ">": ">", "=": "=", "!=": "≠", "<=": "≤", ">=": "≥" };     // comparisons, as shown
+  const ARITH = { "+": "+", "-": "−", "*": "×", "/": "÷", "%": tr("Rest") };           // arithmetic, as shown
 
   // category and shape of each statement; "make" gives a new one for the palette
   const DEFS = {
@@ -62,8 +63,8 @@ window.Flow = (() => {
 
   const PALETTE = [
     { name: tr("Bewegung"), cat: "move", items: [
-      [tr("fahre 1 Schritt"), () => ({ do: "move", dir: "forward", steps: 1 })],
-      [tr("drehe 90°"), () => ({ do: "turn", dir: "left", deg: 90 })],
+      [tr("fahre 1 Schritt"), () => ({ do: "move", dir: "forward", steps: num(1) })],
+      [tr("drehe 90°"), () => ({ do: "turn", dir: "left", deg: num(90) })],
       [tr("fahre los"), () => ({ do: "drive", dir: "forward", power: num(50) })],
       [tr("Motoren einzeln"), () => ({ do: "motors", left: num(50), right: num(50) })],
       [tr("halte an"), () => ({ do: "stop" })]] },
@@ -83,7 +84,8 @@ window.Flow = (() => {
       [tr("💡 Helligkeit"), () => ({ k: "sensor", name: "light" })],
       [tr("⏱ Stoppuhr"), () => ({ k: "sensor", name: "timer" })]], items: [
       [tr("Stoppuhr auf 0"), () => ({ do: "reset_timer" })]] },
-    { name: tr("Rechnen"), cat: "math", values: [
+    { name: tr("Rechnen"), cat: "math", hint: tr("Werte: zieh sie in ein Feld oder auf eine Frage ⬡."), values: [
+      [tr("🧮 Rechnen + − × ÷"), () => ({ k: "calc", a: num(1), fn: "+", b: num(1) })],
       [tr("🎲 Zufall 1 bis 10"), () => ({ k: "random", lo: 1, hi: 10 })]], items: [] },
     { name: tr("Variablen"), cat: "vars", items: [
       [tr("setze Variable"), () => ({ do: "set", var: firstVar(), value: num(0) }), "var"],
@@ -155,6 +157,7 @@ window.Flow = (() => {
     if (v.k === "var" && typeof v.name === "string") return { k: "var", name: v.name };
     if (v.k === "sensor" && SENSOR_VALUES[v.name]) return { k: "sensor", name: v.name };
     if (v.k === "random") return { k: "random", lo: Number(v.lo) || 0, hi: Number(v.hi) || 0 };
+    if (v.k === "calc") return { k: "calc", a: cleanValue(v.a, 0), fn: ARITH[v.fn] ? v.fn : "+", b: cleanValue(v.b, 1) };
     if (v.k === "expr") return { k: "expr", e: v.e && typeof v.e === "object" ? v.e : null };
     return num(def);
   }
@@ -177,7 +180,7 @@ window.Flow = (() => {
       if (out.do === "if") { out.then = cleanSeq(s.then, seen); out.else = cleanSeq(s.else, seen); }
       if (LOOPS.has(out.do)) out.body = cleanSeq(s.body, seen);
       if (["if", "repeat_until", "wait_until"].includes(out.do)) out.cond = cleanCond(s.cond);
-      for (const [key, def] of [["power", 50], ["left", 50], ["right", 50], ["sec", 1], ["times", 4], ["value", 0], ["by", 1]]) {
+      for (const [key, def] of [["steps", 1], ["deg", 90], ["power", 50], ["left", 50], ["right", 50], ["sec", 1], ["times", 4], ["value", 0], ["by", 1]]) {
         if (key in out) out[key] = cleanValue(out[key], def);
       }
       if (out.do === "beep") { out.hz = cleanValue(s.hz, 880); out.sec = cleanValue(s.sec, 0.25); }
@@ -212,6 +215,7 @@ window.Flow = (() => {
       case "var": return { op: "var", name: v.name };
       case "sensor": return v.name === "timer" ? TIMER_SEC : { op: "sensor", name: v.name };
       case "random": return { op: "random", lo: { op: "num", value: v.lo }, hi: { op: "num", value: v.hi } };
+      case "calc": return { op: "bin", fn: v.fn, a: expr(v.a), b: expr(v.b) };
       case "expr": return v.e;
       default: return null;            // the compiler explains
     }
@@ -242,8 +246,8 @@ window.Flow = (() => {
     return arr.map(s => {
       const out = { id: s.id, do: s.do };
       switch (s.do) {
-        case "move": return { ...out, dir: s.dir, steps: s.steps };
-        case "turn": return { ...out, dir: s.dir, deg: s.deg };
+        case "move": return { ...out, dir: s.dir, steps: expr(s.steps) };
+        case "turn": return { ...out, dir: s.dir, deg: expr(s.deg) };
         case "drive": return { ...out, dir: s.dir, power: expr(s.power) };
         case "motors": return { ...out, left: expr(s.left), right: expr(s.right) };
         case "beep": return { ...out, hz: expr(s.hz), sec: expr(s.sec), wait: s.wait };
@@ -289,6 +293,7 @@ window.Flow = (() => {
     if (e.op === "sensor" && SENSOR_VALUES[e.name] && e.name !== "timer") return { k: "sensor", name: e.name };
     if (e.op === "bin" && e.fn === "/" && isSensor(e.a, "timer") && isNum(e.b) && numOf(e.b) === 1000) return { k: "sensor", name: "timer" };
     if (e.op === "random" && isNum(e.lo) && isNum(e.hi)) return { k: "random", lo: numOf(e.lo), hi: numOf(e.hi) };
+    if (e.op === "bin" && ARITH[e.fn]) return { k: "calc", a: valueFrom(e.a), fn: e.fn, b: valueFrom(e.b) };
     return { k: "expr", e };
   }
 
@@ -325,8 +330,8 @@ window.Flow = (() => {
   function stmtFrom(s) {
     const out = { id: String(s.id || newId()), do: s.do };
     switch (s.do) {
-      case "move": return { ...out, dir: s.dir === "backward" ? "backward" : "forward", steps: Number(s.steps) || 1 };
-      case "turn": return { ...out, dir: s.dir === "right" ? "right" : "left", deg: Number(s.deg) || 90 };
+      case "move": return { ...out, dir: s.dir === "backward" ? "backward" : "forward", steps: valueFrom(s.steps) };
+      case "turn": return { ...out, dir: s.dir === "right" ? "right" : "left", deg: valueFrom(s.deg) };
       case "drive": return { ...out, dir: s.dir, power: valueFrom(s.power) };
       case "motors": return { ...out, left: valueFrom(s.left), right: valueFrom(s.right) };
       case "beep": return { ...out, hz: valueFrom(s.hz), sec: valueFrom(s.sec), wait: s.wait !== false };
@@ -403,13 +408,17 @@ window.Flow = (() => {
     if (v.k === "var") return v.name || "?";
     if (v.k === "sensor") return SENSOR_VALUES[v.name];
     if (v.k === "expr") return exprText(v.e);
+    if (v.k === "calc") {
+      const side = x => (x.k === "calc" ? `(${valueText(x)})` : valueText(x));
+      return `${side(v.a)} ${ARITH[v.fn]} ${side(v.b)}`;
+    }
     return tr("🎲 {lo} bis {hi}", { lo: fmtNum(v.lo), hi: fmtNum(v.hi) });
   }
 
   // a formula as text, the way the "Blöcke" view says it
   const SENSOR_TEXT = { distance: tr("Abstand"), light: tr("Helligkeit"), button: tr("Taste gedrückt"), timer: tr("Stoppuhr (ms)"),
                         line_left: tr("Linie links schwarz"), line_right: tr("Linie rechts schwarz") };
-  const OPS = { "+": "+", "-": "−", "*": "×", "/": "÷", "%": tr("Rest"), "<": "<", ">": ">", "=": "=", "<=": "≤", ">=": "≥",
+  const OPS = { ...ARITH, "<": "<", ">": ">", "=": "=", "<=": "≤", ">=": "≥",
                 "!=": "≠", and: tr("und"), or: tr("oder") };
   function exprText(e, nested = false) {
     if (e == null) return "?";
@@ -432,14 +441,22 @@ window.Flow = (() => {
   // a value slot: a number typed in directly, or (via ▾) a variable, a sensor, a random number
   // a value slot: a number typed in, or a value block (variable, sensor, random number) – dropped in from the
   // palette or picked via ▾
-  function valueControl(obj, key, aria, min, max) {
+  function valueControl(obj, key, aria, min, max, layout = false) {
     const v = obj[key];
     const pop = e => openValuePop(e.currentTarget, obj, key);
     let parts;
     if (v.k === "num") {
-      parts = [numberInput(obj, key, { min, max, aria, wrap: n => num(n), unwrap: x => x.n }),
+      parts = [numberInput(obj, key, { min, max, aria, wrap: n => num(n), unwrap: x => x.n, layout }),
         el("button", { type: "button", class: "f-more", "aria-label": tr("{what}: Variable, Sensor oder Zufall", { what: aria }),
                        title: tr("Variable, Sensor oder Zufallszahl"), onclick: pop }, "▾")];
+    } else if (v.k === "calc") {
+      const op = el("select", { class: "f-in f-op", "aria-label": tr("Rechenzeichen"),
+                                onchange: e => { v.fn = e.target.value; changed({ layout: false }); } },
+        Object.entries(ARITH).map(([fn, label]) => el("option", { value: fn, selected: fn === v.fn }, label)));
+      parts = [el("span", { class: "f-chip f-calc", title: tr("Der Roboter rechnet mit ganzen Zahlen: 7 ÷ 2 = 3.") },
+        valueControl(v, "a", tr("linke Zahl")), op, valueControl(v, "b", tr("rechte Zahl"))),
+        el("button", { type: "button", class: "f-more", "aria-label": tr("{what}: ändern", { what: aria }),
+                       title: tr("Durch etwas anderes ersetzen"), onclick: pop }, "▾")];
     } else if (v.k === "random") {
       parts = [el("span", { class: "f-chip f-random" },
         el("button", { type: "button", class: "f-dice", "aria-label": tr("{what}: ändern", { what: aria }), title: tr("Zufallszahl – antippen zum Ändern"), onclick: pop }, "🎲"),
@@ -536,9 +553,9 @@ window.Flow = (() => {
     const t = text => el("span", { class: "f-t" }, text);
     switch (s.do) {
       case "move": return [t(tr("fahre")), choice(s, "dir", [["forward", tr("vorwärts")], ["backward", tr("rückwärts")]], tr("Richtung")),
-        numberInput(s, "steps", { min: 0.1, max: 50, aria: tr("Schritte"), layout: true }), t(s.steps === 1 ? tr("Schritt") : tr("Schritte"))];
+        valueControl(s, "steps", tr("Schritte"), 0.1, 50, true), t(s.steps.k === "num" && s.steps.n === 1 ? tr("Schritt") : tr("Schritte"))];
       case "turn": return [t(tr("drehe")), choice(s, "dir", [["left", tr("links")], ["right", tr("rechts")]], tr("Richtung")),
-        numberInput(s, "deg", { min: 5, max: 720, aria: tr("Winkel") }), t("°")];
+        valueControl(s, "deg", tr("Winkel"), 5, 720), t("°")];
       case "drive": return [t(tr("fahre los")), choice(s, "dir", [["forward", tr("vorwärts")], ["backward", tr("rückwärts")],
         ["left", tr("links herum")], ["right", tr("rechts herum")]], tr("Richtung")), t(tr("mit")), valueControl(s, "power", tr("Tempo"), 0, 100), t("%")];
       case "motors": return [t(tr("Motor links")), valueControl(s, "left", tr("linker Motor"), -100, 100), t(tr("% rechts")),
@@ -615,6 +632,8 @@ window.Flow = (() => {
         popBtn(tr("＋ neu"), () => { const name = newVariable(); if (name) obj[key] = { k: "var", name }; }, "ghost")),
       popRow(el("span", { class: "f-pop-label" }, tr("Sensor")),
         ...Object.entries(SENSOR_VALUES).map(([name, label]) => popBtn(label, () => { obj[key] = { k: "sensor", name }; }, "sensor"))),
+      popRow(el("span", { class: "f-pop-label" }, tr("Rechnen")),
+        ...Object.entries(ARITH).map(([fn, label]) => popBtn(label, () => { obj[key] = { k: "calc", a: v, fn, b: num(1) }; }, "math"))),
       popRow(el("span", { class: "f-pop-label" }, tr("🎲 Zufall")), lo, el("span", {}, tr("bis")), hi, okR));
   }
 

@@ -13,8 +13,8 @@ and too deep nesting are compile errors. A CompileError names the block it is ab
 mark it.
 
 Statements ("do" key):
-    move        dir forward|backward, steps        calibrated "Schritte" (timed)
-    turn        dir left|right, deg                calibrated turn (timed)
+    move        dir forward|backward, steps (expr) calibrated "Schritte" (timed)
+    turn        dir left|right, deg (expr)         calibrated turn (timed)
     drive       dir forward|backward|left|right, power (expr, %)   start driving, keep going
     motors      left, right (expr, %)              raw wheel power, no trim
     stop                                           motors off
@@ -220,16 +220,50 @@ class Compiler:
             self.scaled(e, -factor if neg else factor, 10000)
         self.asm.emit("MOTORS")
 
+    def pause(self):
+        """The calibration's settle pause after a timed drive, in 10 ms."""
+        return max(0, min(254, round(self.cal["settle_ms"] / 10)))
+
     def move(self, left, right, ms):
         """Timed drive with the calibration's settle pause, as MOVE instructions."""
         if self.cal.get("reverse"):
             left, right = -right, -left
-        pause = max(0, min(254, round(self.cal["settle_ms"] / 10)))
+        pause = self.pause()
         ms = max(1, round(ms))
         while ms > 0:
             part = min(ms, MAX_MOVE_MS)
             ms -= part
             self.asm.emit("MOVE", left, right, part, pause if ms == 0 else MOVE_KEEP_DRIVING)
+
+    def timed(self, left, right, amount, limits, ms, per, depth):
+        """Drive for `amount` (steps, degrees) × ms / per milliseconds. A constant is clamped to `limits` and
+        becomes MOVE; anything else the long form (motors, WAIT, motors off, settle pause), skipped when it is
+        0 or less."""
+        c = self.const(amount)
+        if c is not None:
+            self.move(left, right, max(limits[0], min(limits[1], c)) * ms / per)
+            return
+        if self.cal.get("reverse"):
+            left, right = -right, -left
+        asm, slot, end = self.asm, self.temp(depth), Label("end")
+        self.scaled(amount, ms, per)
+        asm.emit("STORE", slot)
+        asm.emit("LOAD", slot)
+        asm.push(0)
+        asm.emit("GT")
+        asm.emit("JZ", end)
+        asm.push(left)
+        asm.push(right)
+        asm.emit("MOTORS")
+        asm.emit("LOAD", slot)
+        asm.emit("WAIT")
+        asm.push(0)
+        asm.push(0)
+        asm.emit("MOTORS")
+        if self.pause():
+            asm.push(self.pause() * 10)
+            asm.emit("WAIT")
+        asm.label(end)
 
     # --- statements
     def block(self, stmts, depth):
@@ -258,17 +292,15 @@ class Compiler:
         outer = asm.owner
         asm.owner = s.get("id", outer)
         if kind == "move":
-            steps = max(0.1, min(50.0, _num(s.get("steps", 1))))
             sign = 1 if s.get("dir") != "backward" else -1
             v, t = self.pwm(cal["speed"]), cal["trim"] / 100
-            self.move(sign * min(255, round(v * (1 - t))), sign * min(255, round(v * (1 + t))),
-                      steps * cal["forward_ms"])
+            self.timed(sign * min(255, round(v * (1 - t))), sign * min(255, round(v * (1 + t))),
+                       s.get("steps", 1), (0.1, 50.0), cal["forward_ms"], 1, depth)
         elif kind == "turn":
-            deg = max(5.0, min(720.0, _num(s.get("deg", 90))))
             v = self.pwm(cal["turn_speed"])
             left = s.get("dir") == "left"
-            ms = cal["turn_left_ms" if left else "turn_right_ms"] * deg / 90
-            self.move(-v, v, ms) if left else self.move(v, -v, ms)
+            self.timed(-v if left else v, v if left else -v, s.get("deg", 90), (5.0, 720.0),
+                       cal["turn_left_ms" if left else "turn_right_ms"], 90, depth)
         elif kind == "drive":
             p = s.get("power", 50)
             trim = cal["trim"]

@@ -64,6 +64,21 @@ class CompilerTests(unittest.TestCase):
         _, log, _, _ = run([{"id": "a", "do": "drive", "dir": "forward", "power": 40}], cal={**CAL, "reverse": True})
         self.assertEqual(log[0][1:], (-102, -102))
 
+    def test_move_and_turn_by_a_variable(self):
+        _, fixed, _, _ = run([{"id": "a", "do": "turn", "dir": "right", "deg": 180}])
+        vm, log, _, r = run([{"id": "a", "do": "set", "var": "w", "value": 90},
+                             {"id": "b", "do": "turn", "dir": "right", "deg": bin_("*", var("w"), num(2))}])
+        self.assertEqual(vm.state, "done")
+        self.assertEqual(log, fixed)                     # same motors, same times as the MOVE of a constant
+        self.assertEqual(r["durations"].get("b", 0), 100)  # only the settle pause is known in advance
+        _, log, _, _ = run([{"id": "a", "do": "set", "var": "n", "value": 3},
+                            {"id": "b", "do": "move", "dir": "backward", "steps": var("n")}], cal={**CAL, "reverse": True})
+        self.assertEqual(log[:2], [(0, 127, 127), (3000, 0, 0)])
+        for n in (0, -2):
+            _, log, _, _ = run([{"id": "a", "do": "set", "var": "n", "value": n},
+                                {"id": "b", "do": "move", "dir": "forward", "steps": var("n")}])
+            self.assertEqual(log, [(0, 0, 0)])           # nothing but HALT's motors off
+
     def test_repeat_and_variables(self):
         vm, _, _, r = run([
             {"id": "a", "do": "set", "var": "n", "value": 5},

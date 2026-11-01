@@ -67,6 +67,7 @@
  "Dieses Programm gibt es nicht mehr.": "This program doesn't exist any more.",
  "Drehen": "Turning",
  "Dreht sich auf der Stelle (Winkel aus der Kalibrierung) und hält dann an.": "Turns on the spot (angle from the calibration), then stops.",
+ "Durch etwas anderes ersetzen": "Replace with something else",
  "Ein Feld ist leer – setz eine Zahl oder einen Baustein ein.": "A field is empty – put in a number or a block.",
  "Ein Schritt soll": "One step is",
  "Ein Stapel liegt lose herum (nicht unter „Wenn ▶ Start geklickt“). Im Ablauf gibt es dafür keinen Platz – änderst du dort etwas, ist er weg.": "A stack is lying around loose (not under \"when ▶ Start clicked\"). The flowchart has no place for it – if you change something there, it is gone.",
@@ -167,6 +168,7 @@
  "Programm": "Program",
  "Programm oder eigener Block": "Program or own block",
  "Programm speichern": "Save program",
+ "Rechenzeichen": "Operator",
  "Rechnen": "Operators",
  "Rechts": "Right",
  "Rechts drehen": "Turn right",
@@ -296,6 +298,7 @@
  "kann so nicht laufen": "can't run like this",
  "kleiner": "zoom out",
  "linke Seite": "left side",
+ "linke Zahl": "left number",
  "linker Motor": "left motor",
  "linker Sensor": "left sensor",
  "links": "left",
@@ -321,6 +324,7 @@
  "oder Adresse eingeben: 192.168.1.50": "or enter the address: 192.168.1.50",
  "oder Adresse eingeben: AA:BB:CC:DD:EE:FF": "or enter the address: AA:BB:CC:DD:EE:FF",
  "rechte Seite": "right side",
+ "rechte Zahl": "right number",
  "rechter Motor": "right motor",
  "rechter Sensor": "right sensor",
  "rechts": "right",
@@ -428,5 +432,6 @@
  "📏 Abstand": "📏 Distance",
  "📯 Hupe": "📯 Horn",
  "🗑 Leeren": "🗑 Clear",
- "🗑 Neu": "🗑 New"
+ "🗑 Neu": "🗑 New",
+ "🧮 Rechnen + − × ÷": "🧮 Calculate + − × ÷"
 }
